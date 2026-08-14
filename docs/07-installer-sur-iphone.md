@@ -26,18 +26,35 @@ Une application web contourne cette règle entièrement, parce qu'elle n'est pas
 
 ## Mettre l'application en ligne
 
-Une seule fois, et c'est fait pour toujours.
+La compilation et la publication sont automatiques : à chaque poussée, le
+workflow [`publier-web.yml`](../.github/workflows/publier-web.yml) analyse le
+code, lance les tests, compile la version web et pousse le résultat sur la
+branche **`gh-pages`**. C'est déjà fait.
 
-1. Sur GitHub : **Settings → Pages → Source : « GitHub Actions »**.
-2. Pousser sur la branche : le fichier
-   [`.github/workflows/publier-web.yml`](../.github/workflows/publier-web.yml)
-   lance l'analyse, les tests, la compilation, puis la publication.
-3. L'adresse devient `https://<compte>.github.io/Evobusiness/`.
+**Il reste un geste, à faire une seule fois**, et seul le propriétaire du dépôt
+peut le faire — GitHub refuse qu'un robot active un site à sa place :
 
-Rien à payer, rien à administrer. Netlify ou un hébergement classique
-conviennent aussi : il suffit de déposer le contenu de `build/web`.
+> **Settings → Pages → Source : « Deploy from a branch » → Branch : `gh-pages`,
+> dossier `/ (root)` → Save**
 
-Pour construire à la main :
+Une à deux minutes plus tard, l'application répond à l'adresse
+`https://<compte>.github.io/Evobusiness/`. Toutes les mises à jour suivantes
+seront automatiques.
+
+### Pourquoi une branche plutôt que le mode « GitHub Actions »
+
+Le mode moderne de Pages a été essayé en premier. Il échoue avant même la
+compilation : créer un site Pages demande des droits d'administration que le
+jeton des workflows n'a pas.
+
+```
+Create Pages site failed. Error: Resource not accessible by integration
+```
+
+Pousser une branche, en revanche, le jeton sait le faire. Le résultat est
+identique pour l'utilisatrice.
+
+### Pour construire à la main
 
 ```bash
 flutter build web --release --no-web-resources-cdn \
@@ -47,6 +64,9 @@ flutter build web --release --no-web-resources-cdn \
 `--no-web-resources-cdn` n'est pas optionnel : sans lui, Flutter va chercher
 son moteur graphique sur un serveur Google et **l'application cesse de
 fonctionner sans connexion**.
+
+Netlify, Vercel ou un hébergement classique conviennent aussi : il suffit d'y
+déposer le contenu de `build/web`.
 
 ---
 

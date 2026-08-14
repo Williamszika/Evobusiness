@@ -34,7 +34,11 @@ flutter build web --release --no-web-resources-cdn \
 ```
 
 Le workflow [`publier-web.yml`](.github/workflows/publier-web.yml) le fait tout
-seul à chaque poussée et publie sur GitHub Pages.
+seul à chaque poussée et publie sur la branche `gh-pages`. Pour que GitHub
+serve le site, une activation unique est nécessaire dans les réglages du
+dépôt — **Settings → Pages → Source : « Deploy from a branch » → `gh-pages`,
+dossier `/ (root)`** — voir
+[`docs/07-installer-sur-iphone.md`](docs/07-installer-sur-iphone.md).
 
 Aucune génération de code n'est nécessaire : `flutter pub get` suffit.
 
