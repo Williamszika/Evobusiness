@@ -62,16 +62,24 @@ sûr quand on n'a pas d'ordinateur sous la main.
 ### En attendant : un lien de dépannage
 
 La branche `web-cdn` contient une version compilée pour être servie par
-`rawcdn.githack.com`, un relais public qui sert les fichiers d'un dépôt GitHub
-avec les bons types MIME — y compris `application/wasm`, indispensable ici.
+`githack.com`, un relais public qui sert les fichiers d'un dépôt GitHub avec les
+bons types MIME — y compris `application/wasm`, indispensable ici.
 
-    https://rawcdn.githack.com/Williamszika/Evobusiness/web-cdn/
+    https://raw.githack.com/Williamszika/Evobusiness/web-cdn/v2/
 
 C'est un dépannage, pas un hébergement : ce relais est un service bénévole,
 avec des limites de débit et aucune garantie de durée. Il permet d'essayer
 l'application tout de suite ; il ne doit pas rester l'adresse d'un outil de
 travail quotidien. La branche `web-cdn` peut être supprimée une fois le vrai
 hébergement en place.
+
+**Le `/v2/` n'est pas décoratif.** Ce relais met les fichiers en cache par
+adresse et ne les relit plus : republier au même endroit continuait de servir
+l'ancienne version, sans la comptabilité. Chaque livraison part donc dans un
+dossier neuf, et **l'adresse change à chaque fois** — ce qui oblige à refaire
+« Sur l'écran d'accueil ». Raison de plus de ne pas s'installer durablement
+ici : avec GitHub Pages, l'adresse ne bouge plus jamais et les mises à jour
+arrivent toutes seules.
 
 ### Pourquoi une branche plutôt que le mode « GitHub Actions »
 
