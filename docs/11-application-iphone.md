@@ -22,7 +22,17 @@ ressemblent au point qu'on ne les distingue pas.
 
 ## Ce qui est prêt
 
-Tout, sauf la signature.
+Tout, sauf la signature. **Et ce n'est pas une supposition : l'application a
+été compilée pour de vrai.**
+
+> Construction du 14/08/2026 — analyse, 98 tests, compilation iOS et
+> empaquetage : **succès en 4 min 50 s**, paquet de **10,8 Mo**.
+> ([exécution n° 1](https://github.com/Williamszika/Evobusiness/actions/runs/31839842266))
+
+C'est le point qui méritait d'être vérifié plutôt qu'affirmé : plusieurs
+composants de l'application embarquent du code natif (base de données,
+impression, appareil photo, sélecteur de fichiers), et c'est exactement là que
+les compilations iOS échouent d'habitude. Aucune n'a bronché.
 
 - Le projet iOS est configuré : nom « Ma Boutique », identifiant
   `com.evobusiness.evobusiness`, autorisations caméra et photothèque rédigées
@@ -143,8 +153,8 @@ pas une décision technique.
 
 1. Onglet **Actions** du dépôt → **« Construire l'application iPhone »** ;
 2. **Run workflow** (ou attendre : il se lance à chaque modification du code) ;
-3. une quinzaine de minutes plus tard, l'archive
-   **`MaBoutique-iphone-non-signee`** se télécharge en bas de la page.
+3. cinq minutes plus tard, l'archive **`MaBoutique-iphone-non-signee`** se
+   télécharge en bas de la page. Elle reste disponible **90 jours**.
 
 Ce fichier est ensuite signé, soit avec le compte développeur, soit avec
 Sideloadly. Il ne s'installe pas tel quel : un iPhone refuse tout paquet non

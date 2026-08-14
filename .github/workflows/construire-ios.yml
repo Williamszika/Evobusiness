@@ -10,9 +10,9 @@
 # public. La signature se fait au moment de l'installation, sur le téléphone
 # ou depuis un ordinateur — voir docs/11-application-iphone.md.
 #
-# Un Mac met une quinzaine de minutes là où Linux en met deux. On ne le
-# réveille donc que lorsque le code de l'application change vraiment — pas
-# pour une correction de documentation — ou à la demande.
+# Mesuré : 4 min 50 s de bout en bout, pour un paquet de 10,8 Mo. On ne
+# réveille tout de même le Mac que lorsque le code de l'application change
+# vraiment — pas pour une correction de documentation — ou à la demande.
 name: Construire l'application iPhone
 
 on:
