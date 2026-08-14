@@ -1,0 +1,1427 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Planche Mèches &amp; Perruques</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* ────────────────────────────────────────────── jetons (thème clair) */
+:root{
+  --fond:#F7F2F4; --surface:#FFFFFF; --surface-2:#FCF7F9; --surface-3:#F2E9ED;
+  --bord:#E5D8DD; --bord-fort:#D2BEC7;
+  --texte:#241823; --texte-2:#5E4A55; --texte-3:#8A7580;
+  --prune:#6E1F46; --prune-doux:#93356B; --sur-prune:#FFFFFF;
+  --laiton:#A9732E; --rose:#E8B4C0;
+  --ok:#2F7D5B; --ok-fond:#E4F1EA;
+  --alerte:#9A6612; --alerte-fond:#FBF0DA;
+  --danger:#A93B2C; --danger-fond:#FAE7E3;
+  --ombre:0 1px 2px rgba(36,24,35,.05), 0 12px 32px -18px rgba(36,24,35,.35);
+  --logo-1:var(--prune); --logo-2:var(--laiton);
+  --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  --mono:ui-monospace,SFMono-Regular,'SF Mono','Cascadia Code','Roboto Mono',monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --fond:#161014; --surface:#1F1720; --surface-2:#271D28; --surface-3:#2F2331;
+    --bord:#3A2B37; --bord-fort:#4C3A48;
+    --texte:#F4EAEF; --texte-2:#C6B1BD; --texte-3:#9A8391;
+    --prune:#E7A2C6; --prune-doux:#F0BBD7; --sur-prune:#2A0E1D;
+    --laiton:#D9A85E; --rose:#E8B4C0;
+    --ok:#6FCFA2; --ok-fond:#163025;
+    --alerte:#E0B057; --alerte-fond:#332812;
+    --danger:#EA9484; --danger-fond:#341914;
+    --ombre:0 1px 2px rgba(0,0,0,.3), 0 14px 36px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --fond:#161014; --surface:#1F1720; --surface-2:#271D28; --surface-3:#2F2331;
+  --bord:#3A2B37; --bord-fort:#4C3A48;
+  --texte:#F4EAEF; --texte-2:#C6B1BD; --texte-3:#9A8391;
+  --prune:#E7A2C6; --prune-doux:#F0BBD7; --sur-prune:#2A0E1D;
+  --laiton:#D9A85E; --rose:#E8B4C0;
+  --ok:#6FCFA2; --ok-fond:#163025;
+  --alerte:#E0B057; --alerte-fond:#332812;
+  --danger:#EA9484; --danger-fond:#341914;
+  --ombre:0 1px 2px rgba(0,0,0,.3), 0 14px 36px -20px rgba(0,0,0,.8);
+}
+
+/* ────────────────────────────────────────────── base */
+*{box-sizing:border-box}
+body{margin:0;background:var(--fond);color:var(--texte);font-family:var(--sans);
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:700;text-wrap:balance;margin:0;letter-spacing:-.015em}
+p{margin:0}
+a{color:var(--prune)}
+:focus-visible{outline:2px solid var(--laiton);outline-offset:3px;border-radius:6px}
+
+.enveloppe{max-width:1120px;margin:0 auto;padding:0 22px}
+.prose{max-width:66ch}
+.section{padding:64px 0;border-top:1px solid var(--bord)}
+.section:first-of-type{border-top:0}
+
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--laiton);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--bord);max-width:120px}
+h2.titre-section{font-size:clamp(28px,4.2vw,40px);line-height:1.1;margin-bottom:12px}
+.chapeau{color:var(--texte-2);font-size:17px;max-width:64ch}
+
+.grille{display:grid;gap:16px}
+@media(min-width:640px){.g2{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}}
+
+.carte{background:var(--surface);border:1px solid var(--bord);border-radius:var(--r);padding:20px}
+.mini{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texte-3)}
+.pastille{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;
+  background:var(--surface-3);color:var(--texte-2);border:1px solid var(--bord)}
+.pastille.ok{background:var(--ok-fond);color:var(--ok);border-color:transparent}
+.pastille.al{background:var(--alerte-fond);color:var(--alerte);border-color:transparent}
+.pastille.dg{background:var(--danger-fond);color:var(--danger);border-color:transparent}
+.pastille.pr{background:var(--prune);color:var(--sur-prune);border-color:transparent}
+
+/* ────────────────────────────────────────────── barre de navigation */
+.barre{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--fond) 88%,transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--bord)}
+.barre .enveloppe{display:flex;align-items:center;gap:8px;height:54px;overflow-x:auto;scrollbar-width:none}
+.barre .enveloppe::-webkit-scrollbar{display:none}
+.barre a{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--texte-3);text-decoration:none;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.barre a:hover{color:var(--texte);background:var(--surface-3)}
+.barre .marque{font-family:var(--serif);font-size:15px;color:var(--texte);font-weight:700;
+  margin-right:auto;white-space:nowrap;letter-spacing:0}
+
+/* ────────────────────────────────────────────── ouverture */
+.ouverture{padding:74px 0 60px;position:relative;overflow:hidden}
+.ouverture h1{font-size:clamp(38px,7.4vw,72px);line-height:1.02;margin:18px 0 20px;max-width:15ch}
+.ouverture h1 em{font-style:italic;color:var(--prune)}
+.ouverture .chapeau{font-size:19px;max-width:56ch}
+.faits{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.fait{background:var(--surface);border:1px solid var(--bord);border-radius:999px;padding:8px 15px;
+  font-size:13px;color:var(--texte-2)}
+.fait b{color:var(--texte);font-weight:600}
+.filet{height:1px;background:linear-gradient(90deg,var(--laiton),transparent);margin-top:40px}
+
+/* ────────────────────────────────────────────── choix cliquables */
+.choix{position:relative;cursor:pointer;transition:border-color .16s,transform .16s,box-shadow .16s;
+  background:var(--surface);border:1px solid var(--bord);border-radius:var(--r);text-align:left;
+  font:inherit;color:inherit;padding:18px;display:block;width:100%}
+.choix:hover{border-color:var(--bord-fort);transform:translateY(-2px);box-shadow:var(--ombre)}
+.choix[aria-pressed="true"]{border-color:var(--prune);box-shadow:0 0 0 2px color-mix(in srgb,var(--prune) 28%,transparent)}
+.coche{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:50%;
+  border:1.5px solid var(--bord-fort);display:grid;place-items:center;color:transparent;font-size:12px;
+  transition:.16s}
+.choix[aria-pressed="true"] .coche{background:var(--prune);border-color:var(--prune);color:var(--sur-prune)}
+
+/* noms */
+.nom{font-family:var(--serif);font-size:23px;line-height:1.15;margin-bottom:6px;padding-right:26px}
+.slogan{font-style:italic;color:var(--prune);font-size:15px;margin-bottom:10px}
+.pourquoi{font-size:14px;color:var(--texte-2);margin-bottom:12px}
+.handle{font-family:var(--mono);font-size:12px;color:var(--texte-3)}
+
+/* familles */
+.famille{margin-top:34px}
+.famille>h3{font-size:19px;margin-bottom:4px}
+.famille>p{color:var(--texte-3);font-size:14px;margin-bottom:16px}
+
+/* podium */
+.podium{background:var(--surface-2);border:1px solid var(--bord);border-left:3px solid var(--laiton);
+  border-radius:var(--r);padding:24px;margin-top:34px}
+.podium ol{margin:16px 0 0;padding-left:20px;display:grid;gap:14px}
+.podium li::marker{font-family:var(--serif);font-weight:700;color:var(--laiton)}
+.podium b{font-family:var(--serif);font-size:18px}
+
+/* ────────────────────────────────────────────── logos */
+.logo-carte{display:flex;flex-direction:column;gap:14px}
+.vitrine{display:flex;align-items:center;gap:14px;background:var(--surface-2);border:1px solid var(--bord);
+  border-radius:10px;padding:16px;justify-content:center}
+.vitrine .mono{--logo-1:var(--texte);--logo-2:var(--texte)}
+.vitrine .neg{--logo-1:var(--sur-prune);--logo-2:var(--laiton);background:var(--prune);
+  border-radius:10px;padding:6px}
+svg.mark{display:block}
+svg.mark .forme{fill:var(--logo-1)}
+svg.mark .trait{stroke:var(--logo-1);fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg.mark .eclat{fill:var(--logo-2)}
+svg.mark .eclat-trait{stroke:var(--logo-2);fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg.mark text{font-family:var(--serif);font-weight:700}
+
+/* ────────────────────────────────────────────── palettes */
+.palette{display:flex;height:64px;border-radius:10px;overflow:hidden;border:1px solid var(--bord);margin-bottom:14px}
+.palette span{flex:1}
+.swatch-liste{display:flex;flex-wrap:wrap;gap:8px;font-family:var(--mono);font-size:11px;color:var(--texte-3)}
+
+/* ────────────────────────────────────────────── téléphones */
+.rail{display:grid;gap:26px}
+@media(min-width:760px){.rail{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1040px){.rail{grid-template-columns:repeat(3,1fr)}}
+.ecran-bloc{display:flex;flex-direction:column;align-items:center;gap:12px}
+.ecran-bloc>.legende{text-align:center;max-width:34ch}
+.legende b{display:block;font-family:var(--serif);font-size:17px;margin-bottom:3px}
+.legende span{font-size:13.5px;color:var(--texte-2)}
+
+.tel{width:288px;background:var(--surface);border:1px solid var(--bord-fort);border-radius:30px;
+  padding:9px;box-shadow:var(--ombre);flex:none}
+.tel-ecran{background:var(--surface-2);border-radius:22px;overflow:hidden;height:568px;
+  display:flex;flex-direction:column;font-size:11.5px;line-height:1.42}
+.statut{display:flex;justify-content:space-between;padding:7px 14px 3px;font-family:var(--mono);
+  font-size:9.5px;color:var(--texte-3)}
+.corps{flex:1;overflow:hidden;padding:6px 12px 10px;display:flex;flex-direction:column;gap:9px}
+.entete-app{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 0 4px}
+.entete-app b{font-family:var(--serif);font-size:15px}
+.entete-app small{color:var(--texte-3);font-size:10px;display:block;font-family:var(--sans)}
+.rond{width:30px;height:30px;border-radius:50%;background:var(--prune);color:var(--sur-prune);
+  display:grid;place-items:center;font-size:11px;font-weight:600;flex:none}
+.nav{display:flex;background:var(--surface);border-top:1px solid var(--bord);padding:7px 4px 9px}
+.nav div{flex:1;text-align:center;font-size:8.5px;color:var(--texte-3);display:flex;
+  flex-direction:column;align-items:center;gap:3px}
+.nav div.on{color:var(--prune);font-weight:600}
+.nav i{width:17px;height:17px;display:block;background:currentColor;opacity:.85;
+  -webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+
+.tuile{background:var(--surface);border:1px solid var(--bord);border-radius:11px;padding:9px 11px}
+.tuile .lbl{font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--texte-3)}
+.tuile .val{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1.2;
+  font-variant-numeric:tabular-nums;margin-top:2px}
+.tuile .val.sm{font-size:14px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rangee{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--bord);
+  border-radius:11px;padding:8px 10px}
+.rangee .txt{flex:1;min-width:0}
+.rangee b{display:block;font-weight:600;font-size:11.5px;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;font-family:var(--sans)}
+.rangee small{color:var(--texte-3);font-size:9.5px}
+.vignette{width:34px;height:34px;border-radius:8px;flex:none;
+  background:linear-gradient(135deg,var(--surface-3),var(--rose));display:grid;place-items:center}
+.montant{font-variant-numeric:tabular-nums;font-weight:600;font-size:11.5px;white-space:nowrap}
+.mini-badge{font-family:var(--mono);font-size:8.5px;padding:2px 6px;border-radius:999px;
+  background:var(--surface-3);color:var(--texte-2);white-space:nowrap}
+.mini-badge.ok{background:var(--ok-fond);color:var(--ok)}
+.mini-badge.al{background:var(--alerte-fond);color:var(--alerte)}
+.mini-badge.dg{background:var(--danger-fond);color:var(--danger)}
+.bouton{background:var(--prune);color:var(--sur-prune);border-radius:10px;padding:10px;text-align:center;
+  font-weight:600;font-size:12px}
+.bouton.fant{background:transparent;color:var(--texte);border:1px solid var(--bord-fort)}
+.champ-faux{background:var(--surface);border:1px solid var(--bord);border-radius:10px;padding:8px 11px;
+  color:var(--texte-3);font-size:11px;display:flex;align-items:center;gap:7px}
+.puces{display:flex;gap:6px;flex-wrap:wrap}
+.puces span{font-size:9.5px;padding:4px 9px;border-radius:999px;border:1px solid var(--bord);color:var(--texte-2)}
+.puces span.on{background:var(--prune);color:var(--sur-prune);border-color:transparent}
+.jauge{height:6px;border-radius:4px;background:var(--surface-3);overflow:hidden}
+.jauge i{display:block;height:100%;background:linear-gradient(90deg,var(--prune-doux),var(--prune))}
+.titre-bloc{display:flex;justify-content:space-between;align-items:baseline;font-size:10px;
+  color:var(--texte-3);font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+.histo{display:flex;align-items:flex-end;gap:6px;height:78px;padding-top:4px}
+.histo div{flex:1;background:var(--surface-3);border-radius:4px 4px 2px 2px;position:relative}
+.histo div.on{background:linear-gradient(180deg,var(--prune-doux),var(--prune))}
+.histo div::after{content:attr(data-m);position:absolute;bottom:-14px;left:0;right:0;text-align:center;
+  font-size:8px;color:var(--texte-3);font-family:var(--mono)}
+.sep{height:1px;background:var(--bord)}
+
+/* reçu papier */
+.papiers{display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start;justify-content:center}
+.papier{background:#fff;color:#241823;border-radius:4px;box-shadow:var(--ombre);
+  border:1px solid var(--bord);font-size:11px;line-height:1.45}
+.papier.a5{width:330px;padding:22px}
+.papier.ticket{width:214px;padding:15px 13px;font-size:10px}
+.papier .haut{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
+  border-bottom:1px solid #d9ccd2;padding-bottom:11px}
+.papier.ticket .haut{flex-direction:column;align-items:center;text-align:center;gap:5px}
+.papier h4{font-size:17px;color:#6E1F46;margin-bottom:1px}
+.papier.ticket h4{font-size:14px}
+.papier .coord{font-size:9px;color:#6b5560;text-align:right}
+.papier.ticket .coord{text-align:center}
+.papier table{width:100%;border-collapse:collapse;margin-top:11px}
+.papier th{font-size:9px;text-transform:uppercase;letter-spacing:.05em;text-align:left;
+  border-top:1px solid #d9ccd2;border-bottom:1px solid #d9ccd2;padding:5px 0;color:#6b5560}
+.papier td{padding:5px 0;border-bottom:1px solid #efe6ea;vertical-align:top}
+.papier .det{font-size:9px;color:#8a7580}
+.papier .tot{display:flex;justify-content:space-between;padding:2px 0;font-size:10.5px}
+.papier .grand{display:flex;justify-content:space-between;border-top:2px solid #241823;
+  border-bottom:2px solid #241823;padding:7px 0;margin-top:5px;font-family:var(--serif);
+  font-weight:700;font-size:14px}
+.papier .solde{display:flex;justify-content:space-between;background:#FBF0DA;color:#7a5210;
+  padding:5px 8px;border-radius:6px;font-weight:700;margin-top:6px;font-size:10.5px}
+.papier .pied{text-align:center;margin-top:13px;border-top:1px solid #d9ccd2;padding-top:9px}
+.papier .pied b{font-family:var(--serif);color:#6E1F46;font-size:12px}
+.papier .pied small{display:block;color:#8a7580;font-size:8.5px;margin-top:5px}
+.num{font-variant-numeric:tabular-nums}
+.etq-papier{text-align:center;margin-top:12px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--texte-3)}
+
+/* listes de fonctions */
+.fonctions{display:grid;gap:10px}
+.fonction{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--bord);
+  border-radius:11px;padding:13px 15px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%;
+  transition:border-color .16s}
+.fonction:hover{border-color:var(--bord-fort)}
+.fonction[aria-pressed="true"]{border-color:var(--prune);background:var(--surface-2)}
+.case{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--bord-fort);flex:none;margin-top:2px;
+  display:grid;place-items:center;font-size:11px;color:transparent}
+.fonction[aria-pressed="true"] .case{background:var(--prune);border-color:var(--prune);color:var(--sur-prune)}
+.fonction b{display:block;font-weight:600;font-size:15px;font-family:var(--sans)}
+.fonction span{font-size:13.5px;color:var(--texte-2)}
+
+/* tableau technique */
+.tableau-enrobage{overflow-x:auto;border:1px solid var(--bord);border-radius:var(--r);background:var(--surface)}
+table.tech{border-collapse:collapse;width:100%;min-width:540px;font-size:14.5px}
+table.tech th{text-align:left;padding:12px 16px;background:var(--surface-2);border-bottom:1px solid var(--bord);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--texte-3);
+  font-weight:500}
+table.tech td{padding:12px 16px;border-bottom:1px solid var(--bord);vertical-align:top}
+table.tech tr:last-child td{border-bottom:0}
+table.tech code{font-family:var(--mono);font-size:12.5px;background:var(--surface-3);padding:2px 6px;
+  border-radius:5px;color:var(--texte)}
+
+.etapes{display:grid;gap:0;counter-reset:e}
+.etape{display:grid;grid-template-columns:auto 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--bord)}
+.etape:last-child{border-bottom:0}
+.etape .no{font-family:var(--mono);font-size:12px;color:var(--laiton);padding-top:4px;white-space:nowrap}
+.etape b{font-family:var(--serif);font-size:18px;display:block;margin-bottom:4px}
+.etape p{color:var(--texte-2);font-size:14.5px}
+
+.liste-check{display:grid;gap:9px;margin-top:16px;padding:0;list-style:none}
+.liste-check li{display:flex;gap:11px;font-size:15px;color:var(--texte-2)}
+.liste-check li::before{content:"▸";color:var(--laiton);flex:none}
+
+/* récapitulatif */
+.recap{background:var(--surface);border:1px solid var(--bord);border-radius:var(--r);padding:24px;
+  position:relative}
+.recap-ligne{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--bord);
+  align-items:baseline;flex-wrap:wrap}
+.recap-ligne:last-of-type{border-bottom:0}
+.recap-ligne .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texte-3)}
+.recap-ligne .v{font-family:var(--serif);font-size:18px;text-align:right}
+.recap-ligne .v.vide{font-family:var(--sans);font-size:14px;color:var(--texte-3);font-style:italic}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+button.act{font:inherit;font-size:14px;font-weight:600;padding:11px 18px;border-radius:10px;cursor:pointer;
+  border:1px solid var(--bord-fort);background:var(--surface);color:var(--texte);transition:.16s}
+button.act:hover{border-color:var(--prune);color:var(--prune)}
+button.act.plein{background:var(--prune);color:var(--sur-prune);border-color:var(--prune)}
+button.act.plein:hover{opacity:.9;color:var(--sur-prune)}
+#sortie{width:100%;margin-top:16px;font-family:var(--mono);font-size:12px;line-height:1.6;padding:14px;
+  border-radius:10px;border:1px solid var(--bord);background:var(--surface-2);color:var(--texte);
+  min-height:150px;resize:vertical;display:none}
+#sortie.vu{display:block}
+
+footer.fin{padding:44px 0 64px;color:var(--texte-3);font-size:13.5px;border-top:1px solid var(--bord)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<nav class="barre">
+  <div class="enveloppe">
+    <span class="marque">Planche&nbsp;de&nbsp;proposition</span>
+    <a href="#noms">Noms</a>
+    <a href="#identite">Couleurs</a>
+    <a href="#logos">Logos</a>
+    <a href="#maquette">Maquette</a>
+    <a href="#recu">Reçu</a>
+    <a href="#fonctions">Fonctions</a>
+    <a href="#flutter">Flutter</a>
+    <a href="#choix">Mes choix</a>
+  </div>
+</nav>
+
+<header class="ouverture">
+  <div class="enveloppe">
+    <p class="eyebrow">Mèches &amp; perruques — avant de coder</p>
+    <h1>Choisis ta marque,<br>ensuite on <em>construit</em>.</h1>
+    <p class="chapeau">Trois décisions à prendre ici : le <b>nom</b>, le <b>logo</b>, et ce que
+      l'application doit savoir faire le premier jour. Tout est déjà dessiné ci-dessous — écrans
+      compris. Rien n'est encore codé.</p>
+    <div class="faits">
+      <span class="fait"><b>20</b> noms proposés</span>
+      <span class="fait"><b>8</b> pistes de logo</span>
+      <span class="fait"><b>8</b> écrans maquettés</span>
+      <span class="fait"><b>2</b> formats de reçu</span>
+      <span class="fait">App <b>Flutter</b> · Android, iOS, hors-ligne</span>
+    </div>
+    <div class="filet"></div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════ NOMS -->
+<section class="section" id="noms">
+  <div class="enveloppe">
+    <p class="eyebrow">Décision 1</p>
+    <h2 class="titre-section">Le nom du business</h2>
+    <p class="chapeau">Vingt propositions, rangées par intention. Clique sur celles qui te parlent —
+      elles se retrouveront dans le récapitulatif tout en bas.</p>
+
+    <div class="famille">
+      <h3>Royauté &amp; élégance</h3>
+      <p>Le cheveu comme une couronne. Ton haut de gamme, parfait pour les perruques à prix élevé.</p>
+      <div class="grille g3">
+        <button class="choix" data-groupe="nom" data-valeur="Belle Couronne"><span class="coche">✓</span>
+          <p class="nom">Belle Couronne</p><p class="slogan">« Ta couronne, ton pouvoir. »</p>
+          <p class="pourquoi">Français, chaleureux, immédiatement compris. La couronne donne un logo évident et un vocabulaire entier : cliente = reine, commande = couronnement.</p>
+          <p class="handle">@bellecouronne</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Reine d'Ébène"><span class="coche">✓</span>
+          <p class="nom">Reine d'Ébène</p><p class="slogan">« La beauté noire, couronnée. »</p>
+          <p class="pourquoi">Assume une identité forte et fidélise une communauté. Attention : t'enferme un peu si tu vends un jour du blond 613 ou du synthétique clair.</p>
+          <p class="handle">@reinedebene</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Maison Kora"><span class="coche">✓</span>
+          <p class="nom">Maison Kora</p><p class="slogan">« L'élégance, cheveu par cheveu. »</p>
+          <p class="pourquoi">« Maison » installe le sérieux d'une marque de mode. Kora se prononce partout et se remplace par ton prénom : Maison Sarah, Maison Nadia.</p>
+          <p class="handle">@maisonkora</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Couronne d'Or"><span class="coche">✓</span>
+          <p class="nom">Couronne d'Or</p><p class="slogan">« Le luxe posé sur la tête. »</p>
+          <p class="pourquoi">Très mémorisable à l'oral, idéal pour le bouche-à-oreille au marché. Le mot « or » justifie des prix premium.</p>
+          <p class="handle">@couronnedor.hair</p></button>
+      </div>
+    </div>
+
+    <div class="famille">
+      <h3>Court &amp; international</h3>
+      <p>Deux syllabes, aucune faute d'orthographe possible. Le meilleur choix si tu vises aussi la diaspora et la vente en ligne.</p>
+      <div class="grille g4">
+        <button class="choix" data-groupe="nom" data-valeur="Zuri Hair"><span class="coche">✓</span>
+          <p class="nom">Zuri Hair</p><p class="slogan">« Zuri : belle, en swahili. »</p>
+          <p class="pourquoi">Court, africain, prononçable en français comme en anglais. Le Z fait un monogramme superbe.</p>
+          <p class="handle">@zurihair</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Nyla Hair"><span class="coche">✓</span>
+          <p class="nom">Nyla Hair</p><p class="slogan">« Simple. Belle. Toi. »</p>
+          <p class="pourquoi">Doux, féminin, moderne. Sonne comme une marque déjà installée — utile quand on démarre.</p>
+          <p class="handle">@nylahair.co</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Amani Hair"><span class="coche">✓</span>
+          <p class="nom">Amani Hair</p><p class="slogan">« La paix d'avoir de beaux cheveux. »</p>
+          <p class="pourquoi">Amani = paix en swahili. Ton apaisant, différenciant dans un marché qui crie beaucoup.</p>
+          <p class="handle">@amanihair</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Lova Hair"><span class="coche">✓</span>
+          <p class="nom">Lova Hair</p><p class="slogan">« Fais-toi plaisir. »</p>
+          <p class="pourquoi">Joyeux, jeune, très TikTok. Facile à décliner : Lova Wigs, Lova Care, Lova Studio.</p>
+          <p class="handle">@lovahair</p></button>
+      </div>
+    </div>
+
+    <div class="famille">
+      <h3>Clair &amp; descriptif</h3>
+      <p>On sait ce que tu vends avant même d'ouvrir la page. Excellent pour être trouvée dans une recherche.</p>
+      <div class="grille g4">
+        <button class="choix" data-groupe="nom" data-valeur="Mèches &amp; Merveilles"><span class="coche">✓</span>
+          <p class="nom">Mèches &amp; Merveilles</p><p class="slogan">« Des mèches, et un peu de magie. »</p>
+          <p class="pourquoi">L'allitération se retient toute seule. Le plus mémorable de la liste à l'oral.</p>
+          <p class="handle">@mechesetmerveilles</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="L'Atelier des Mèches"><span class="coche">✓</span>
+          <p class="nom">L'Atelier des Mèches</p><p class="slogan">« Choisies, posées, sublimées. »</p>
+          <p class="pourquoi">« Atelier » suggère le conseil et la pose, pas seulement la revente. Justifie une marge de service.</p>
+          <p class="handle">@latelierdesmeches</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Perruque Prestige"><span class="coche">✓</span>
+          <p class="nom">Perruque Prestige</p><p class="slogan">« La perruque qui ne trahit jamais. »</p>
+          <p class="pourquoi">Direct et haut de gamme. Limite : le mot « perruque » seul écarte les mèches et les soins.</p>
+          <p class="handle">@perruqueprestige</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="La Malle à Mèches"><span class="coche">✓</span>
+          <p class="nom">La Malle à Mèches</p><p class="slogan">« Ouvre, choisis, brille. »</p>
+          <p class="pourquoi">Image de coffre à trésors, sympathique et féminine. Se prête bien aux photos de déballage d'arrivage.</p>
+          <p class="handle">@lamalleameches</p></button>
+      </div>
+    </div>
+
+    <div class="famille">
+      <h3>Racines &amp; identité</h3>
+      <p>Le cheveu comme héritage. Fort pouvoir de contenu : chaque publication raconte quelque chose.</p>
+      <div class="grille g4">
+        <button class="choix" data-groupe="nom" data-valeur="Racines &amp; Reines"><span class="coche">✓</span>
+          <p class="nom">Racines &amp; Reines</p><p class="slogan">« D'où tu viens se voit dans tes cheveux. »</p>
+          <p class="pourquoi">Double sens : racines du cheveu, racines africaines. Allitération mémorable, et une infinité de sujets à publier.</p>
+          <p class="handle">@racinesetreines</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Fille de Reine"><span class="coche">✓</span>
+          <p class="nom">Fille de Reine</p><p class="slogan">« Tu tiens ça de ta mère. »</p>
+          <p class="pourquoi">Chaleureux, affectif, très partageable. Crée une communauté plutôt qu'une clientèle.</p>
+          <p class="handle">@filledereine</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Karité &amp; Kinky"><span class="coche">✓</span>
+          <p class="nom">Karité &amp; Kinky</p><p class="slogan">« Naturel dedans, sublime dehors. »</p>
+          <p class="pourquoi">Idéal si tu ajoutes des soins à ton catalogue. Le duo mèches + entretien double le panier moyen.</p>
+          <p class="handle">@kariteetkinky</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Tresse &amp; Toi"><span class="coche">✓</span>
+          <p class="nom">Tresse &amp; Toi</p><p class="slogan">« On s'occupe du reste. »</p>
+          <p class="pourquoi">Complice, tutoie la cliente. Parfait si tu proposes aussi la pose et les tresses.</p>
+          <p class="handle">@tresseettoi</p></button>
+      </div>
+    </div>
+
+    <div class="famille">
+      <h3>Attitude &amp; jeunesse</h3>
+      <p>Énergie réseaux sociaux, clientèle 18–28 ans, renouvellement rapide.</p>
+      <div class="grille g4">
+        <button class="choix" data-groupe="nom" data-valeur="Glow Hair Bar"><span class="coche">✓</span>
+          <p class="nom">Glow Hair Bar</p><p class="slogan">« Entre, brille, sors. »</p>
+          <p class="pourquoi">« Bar » évoque un passage rapide et régulier. Bon si tu veux un lieu physique un jour.</p>
+          <p class="handle">@glowhairbar</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Slay Studio"><span class="coche">✓</span>
+          <p class="nom">Slay Studio</p><p class="slogan">« Prête pour tout. »</p>
+          <p class="pourquoi">Très efficace auprès des jeunes clientes. Risque : mot d'argot qui peut vieillir en trois ans.</p>
+          <p class="handle">@slaystudio.hair</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Wow Hair"><span class="coche">✓</span>
+          <p class="nom">Wow Hair</p><p class="slogan">« La réaction qu'on attend. »</p>
+          <p class="pourquoi">Ultra court, retenu du premier coup. Ajoute ta ville pour l'ancrer : Wow Hair Douala.</p>
+          <p class="handle">@wowhair.officiel</p></button>
+        <button class="choix" data-groupe="nom" data-valeur="Sublime &amp; Co"><span class="coche">✓</span>
+          <p class="nom">Sublime &amp; Co</p><p class="slogan">« Chaque tête, une signature. »</p>
+          <p class="pourquoi">Élégant sans être froid, et le « &amp; Co » laisse la porte ouverte aux accessoires et aux soins.</p>
+          <p class="handle">@sublimeandco</p></button>
+      </div>
+    </div>
+
+    <div class="podium">
+      <p class="mini">Si je devais trancher</p>
+      <ol>
+        <li><b>Zuri Hair</b> — le plus solide sur la durée. Court, sans faute possible, prononçable
+          en français et en anglais, disponible plus souvent que les noms français, et il ne t'enferme
+          ni dans un produit ni dans un âge. Le monogramme « Z » fait un logo net même en 32 pixels.</li>
+        <li><b>Belle Couronne</b> — le plus attachant en francophonie. Il porte tout un langage de
+          marque déjà écrit, et il permet des prix hauts sans paraître prétentieux.</li>
+        <li><b>Racines &amp; Reines</b> — le plus fort en contenu. Si tu comptes vendre par
+          Instagram et TikTok, ce nom te donne un sujet de publication par semaine pendant deux ans.</li>
+      </ol>
+    </div>
+
+    <div class="carte" style="margin-top:26px">
+      <p class="mini">À vérifier avant de graver le nom</p>
+      <ul class="liste-check">
+        <li>Le compte Instagram et TikTok est-il libre ? Vérifie <b>les deux</b> avant de choisir.</li>
+        <li>Le nom de domaine <code style="font-family:var(--mono);font-size:13px">.com</code> ou local est-il disponible ?</li>
+        <li>La marque est-elle déjà déposée ? En Afrique francophone, c'est l'<b>OAPI</b> ; en France, l'<b>INPI</b>.</li>
+        <li>Dis-le au téléphone à quelqu'un : s'il doit demander l'orthographe, écarte-le.</li>
+        <li>Il tient dans un rond de 3 cm — sur un sachet, un cachet, une photo de profil ?</li>
+        <li><b>Ne t'enferme pas.</b> « Perruque… » exclut les mèches ; « … Douala » exclut Abidjan.
+          Choisis large, tu grandiras dedans.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ IDENTITÉ -->
+<section class="section" id="identite">
+  <div class="enveloppe">
+    <p class="eyebrow">Décision 2 — première partie</p>
+    <h2 class="titre-section">Couleurs &amp; lettres</h2>
+    <p class="chapeau">La couleur sera partout : l'app, le reçu, le sachet, les stories. Trois
+      directions, trois clientèles différentes.</p>
+
+    <div class="grille g3" style="margin-top:28px">
+      <button class="choix" data-groupe="palette" data-valeur="Prune & Laiton"><span class="coche">✓</span>
+        <div class="palette" aria-hidden="true">
+          <span style="background:#6E1F46"></span><span style="background:#93356B"></span>
+          <span style="background:#A9732E"></span><span style="background:#E8B4C0"></span>
+          <span style="background:#F7F2F4"></span><span style="background:#241823"></span>
+        </div>
+        <p class="nom" style="font-size:20px">Prune &amp; Laiton</p>
+        <p class="pourquoi">Le choix de cette planche. Féminin sans être enfantin, le laiton apporte
+          la valeur sans le cliché du doré brillant. Lisible en noir et blanc sur un reçu imprimé.</p>
+        <p class="swatch-liste"><span>#6E1F46</span><span>#A9732E</span><span>#E8B4C0</span><span>#241823</span></p>
+      </button>
+      <button class="choix" data-groupe="palette" data-valeur="Nuit & Or"><span class="coche">✓</span>
+        <div class="palette" aria-hidden="true">
+          <span style="background:#14110F"></span><span style="background:#2A241F"></span>
+          <span style="background:#C9A227"></span><span style="background:#E5D8B8"></span>
+          <span style="background:#FAF7F0"></span><span style="background:#000"></span>
+        </div>
+        <p class="nom" style="font-size:20px">Nuit &amp; Or</p>
+        <p class="pourquoi">Pour un positionnement franchement luxe : perruques à forte valeur,
+          clientèle plus âgée, prix assumés. Très photogénique, mais coûteux à imprimer en noir plein.</p>
+        <p class="swatch-liste"><span>#14110F</span><span>#C9A227</span><span>#E5D8B8</span><span>#FAF7F0</span></p>
+      </button>
+      <button class="choix" data-groupe="palette" data-valeur="Terre & Rose poudré"><span class="coche">✓</span>
+        <div class="palette" aria-hidden="true">
+          <span style="background:#8C4A3F"></span><span style="background:#B5705F"></span>
+          <span style="background:#E8B4C0"></span><span style="background:#D9C3A5"></span>
+          <span style="background:#FBF4F1"></span><span style="background:#2E211C"></span>
+        </div>
+        <p class="nom" style="font-size:20px">Terre &amp; Rose poudré</p>
+        <p class="pourquoi">Douce, naturelle, rassurante. Parfaite si tu ajoutes des soins, du karité
+          et un discours « cheveu sain ». Moins premium, plus proche.</p>
+        <p class="swatch-liste"><span>#8C4A3F</span><span>#E8B4C0</span><span>#D9C3A5</span><span>#2E211C</span></p>
+      </button>
+    </div>
+
+    <div class="grille g2" style="margin-top:16px">
+      <div class="carte">
+        <p class="mini">Les lettres</p>
+        <p style="font-family:var(--serif);font-size:30px;margin:10px 0 2px">Belle Couronne</p>
+        <p class="mini" style="margin-bottom:14px">Titres — une serif à contraste. En Flutter :
+          <code style="font-family:var(--mono);font-size:12.5px">google_fonts</code> → Playfair Display ou Cormorant Garamond.</p>
+        <div class="sep" style="margin:14px 0"></div>
+        <p style="font-size:17px;margin-bottom:2px">Mèche brésilienne Body Wave 18″ — 38 000 FCFA</p>
+        <p class="mini">Textes &amp; chiffres — une sans-serif neutre : Inter ou DM Sans, avec chiffres
+          tabulaires pour que les montants s'alignent en colonne.</p>
+      </div>
+      <div class="carte">
+        <p class="mini">Deux règles à ne jamais casser</p>
+        <ul class="liste-check">
+          <li><b>Un seul accent.</b> La couleur forte sert aux boutons d'action et au total du reçu. Partout ailleurs : du calme.</li>
+          <li><b>Le reçu doit survivre au noir et blanc.</b> Beaucoup d'imprimantes ne font pas la
+            couleur. Le logo et le total doivent rester lisibles en gris.</li>
+          <li>Le vert, l'orange et le rouge sont réservés aux <b>états</b> (payé, stock bas, impayé).
+            Jamais décoratifs, sinon on ne repère plus les alertes.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ LOGOS -->
+<section class="section" id="logos">
+  <div class="enveloppe">
+    <p class="eyebrow">Décision 2 — deuxième partie</p>
+    <h2 class="titre-section">Huit pistes de logo</h2>
+    <p class="chapeau">Chaque piste est montrée trois fois : en couleur, en une seule encre (pour le
+      cachet et le reçu), et en pastille d'application. Un logo qui ne survit pas aux trois n'est pas
+      un bon logo.</p>
+
+    <div class="grille g3" style="margin-top:28px">
+
+      <button class="choix logo-carte" data-groupe="logo" data-valeur="La Couronne"><span class="coche">✓</span>
+        <div class="vitrine">
+          <svg class="mark" width="60" height="60" viewBox="0 0 96 96" aria-label="Logo couronne">
+            <path class="forme" d="M14 68 L20 30 C24 40 30 46 34 46 C40 46 42 22 48 22 C54 22 56 46 62 46 C66 46 72 40 76 30 L82 68 Z"/>
+            <rect class="forme" x="14" y="71" width="68" height="9" rx="4.5"/>
+            <circle class="eclat" cx="48" cy="18" r="4.5"/><circle class="eclat" cx="20" cy="26" r="3.5"/><circle class="eclat" cx="76" cy="26" r="3.5"/>
+          </svg>
+          <span class="mono"><svg class="mark" width="34" height="34" viewBox="0 0 96 96" aria-hidden="true">
+            <path class="forme" d="M14 68 L20 30 C24 40 30 46 34 46 C40 46 42 22 48 22 C54 22 56 46 62 46 C66 46 72 40 76 30 L82 68 Z"/>
+            <rect class="forme" x="14" y="71" width="68" height="9" rx="4.5"/>
+            <circle class="eclat" cx="48" cy="18" r="4.5"/><circle class="eclat" cx="20" cy="26" r="3.5"/><circle class="eclat" cx="76" cy="26" r="3.5"/></svg></span>
+          <span class="neg"><svg class="mark" width="28" height="28" viewBox="0 0 96 96" aria-hidden="true">
+            <path class="forme" d="M14 68 L20 30 C24 40 30 46 34 46 C40 46 42 22 48 22 C54 22 56 46 62 46 C66 46 72 40 76 30 L82 68 Z"/>
+            <rect class="forme" x="14" y="71" width="68" height="9" rx="4.5"/>
+            <circle class="eclat" cx="48" cy="18" r="4.5"/></svg></span>
+        </div>
+        <div><p class="nom" style="font-size:19px">La Couronne</p>
+          <p class="pourquoi">Les pointes sont des vagues de cheveux, pas des piques. Reconnaissable
+            à 20 mètres sur une devanture.</p>
+          <p class="handle">Belle Couronne · Couronne d'Or · Reine d'Ébène</p></div>
+      </button>
+
+      <button class="choix logo-carte" data-groupe="logo" data-valeur="Le Monogramme"><span class="coche">✓</span>
+        <div class="vitrine">
+          <svg class="mark" width="60" height="60" viewBox="0 0 96 96" aria-label="Logo monogramme">
+            <circle class="forme" cx="48" cy="48" r="44"/>
+            <circle class="eclat-trait" cx="48" cy="48" r="37" stroke-width="1.6"/>
+            <text x="48" y="49" text-anchor="middle" dominant-baseline="central" font-size="42" fill="var(--sur-prune)">Z</text>
+          </svg>
+          <span class="mono"><svg class="mark" width="34" height="34" viewBox="0 0 96 96" aria-hidden="true">
+            <circle class="trait" cx="48" cy="48" r="43" stroke-width="4"/>
+            <text x="48" y="49" text-anchor="middle" dominant-baseline="central" font-size="42" fill="var(--logo-1)">Z</text></svg></span>
+          <span class="neg"><svg class="mark" width="28" height="28" viewBox="0 0 96 96" aria-hidden="true">
+            <circle class="eclat-trait" cx="48" cy="48" r="40" stroke-width="4"/>
+            <text x="48" y="49" text-anchor="middle" dominant-baseline="central" font-size="46" fill="var(--logo-1)">Z</text></svg></span>
+        </div>
+        <div><p class="nom" style="font-size:19px">Le Monogramme</p>
+          <p class="pourquoi">La solution la plus économique et la plus durable : une lettre, un
+            cercle, un filet. Se brode, se grave, se tamponne.</p>
+          <p class="handle">Zuri · Nyla · Maison Kora · Sublime &amp; Co</p></div>
+      </button>
+
+      <button class="choix logo-carte" data-groupe="logo" data-valeur="La Boucle"><span class="coche">✓</span>
+        <div class="vitrine">
+          <svg class="mark" width="60" height="60" viewBox="0 0 96 96" aria-label="Logo boucle">
+            <path class="trait" stroke-width="9" d="M20 78 C20 44 38 22 60 22 C76 22 86 33 86 47 C86 60 76 69 64 69 C55 69 48 62 48 54 C48 47 53 42 59 42"/>
+            <circle class="eclat" cx="59" cy="42" r="6"/>
+          </svg>
+          <span class="mono"><svg class="mark" width="34" height="34" viewBox="0 0 96 96" aria-hidden="true">
+            <path class="trait" stroke-width="9" d="M20 78 C20 44 38 22 60 22 C76 22 86 33 86 47 C86 60 76 69 64 69 C55 69 48 62 48 54 C48 47 53 42 59 42"/>
+            <circle class="eclat" cx="59" cy="42" r="6"/></svg></span>
+          <span class="neg"><svg class="mark" width="28" height="28" viewBox="0 0 96 96" aria-hidden="true">
+            <path class="trait" stroke-width="10" d="M20 78 C20 44 38 22 60 22 C76 22 86 33 86 47 C86 60 76 69 64 69 C55 69 48 62 48 54 C48 47 53 42 59 42"/>
+            <circle class="eclat" cx="59" cy="42" r="6"/></svg></span>
+        </div>
+        <div><p class="nom" style="font-size:19px">La Boucle</p>
+          <p class="pourquoi">Un seul geste continu, comme une mèche qui s'enroule. Le plus moderne
+            de la série, et le plus facile à animer dans l'app.</p>
+          <p class="handle">Lova · Glow Hair Bar · Amani</p></div>
+      </button>
+
+      <button class="choix logo-carte" data-groupe="logo" data-valeur="La Cascade"><span class="coche">✓</span>
+        <div class="vitrine">
+          <svg class="mark" width="60" height="60" viewBox="0 0 96 96" aria-label="Logo cascade">
+            <path class="trait" stroke-width="8" d="M16 80 C16 46 28 20 46 14"/>
+            <path class="eclat-trait" stroke-width="8" d="M36 82 C36 48 48 22 66 16"/>
+            <path class="trait" stroke-width="8" d="M56 84 C56 50 68 24 86 18"/>
+          </svg>
+          <span class="mono"><svg class="mark" width="34" height="34" viewBox="0 0 96 96" aria-hidden="true">
+            <path class="trait" stroke-width="8" d="M16 80 C16 46 28 20 46 14"/>
+            <path class="eclat-trait" stroke-width="8" d="M36 82 C36 48 48 22 66 16"/>
+            <path class="trait" stroke-width="8" d="M56 84 C56 50 68 24 86 18"/></svg></span>
+          <span class="neg"><svg class="mark" width="28" height="28" viewBox="0 0 96 96" aria-hidden="true">
+            <path class="trait" stroke-width="9" d="M16 80 C16 46 28 20 46 14"/>
+            <path class="eclat-trait" stroke-width="9" d="M36 82 C36 48 48 22 66 16"/>
+            <path class="trait" stroke-width="9" d="M56 84 C56 50 68 24 86 18"/></svg></span>
+        </div>
+        <div><p class="nom" style="font-size:19px">La Cascade</p>
+          <p class="pourquoi">Trois longueurs qui tombent. Abstrait, élégant, et il parle exactement
+            de ce que tu vends : de la longueur.</p>
+          <p class="handle">Nyla · Sublime &amp; Co · L'Atelier des Mèches</p></div>
+      </button>
+
+      <button class="choix logo-carte" data-groupe="logo" data-valeur="La Tresse"><span class="coche">✓</span>
+        <div class="vitrine">
+          <svg class="mark" width="60" height="60" viewBox="0 0 96 96" aria-label="Logo tresse">
+            <path class="trait" stroke-width="9" d="M34 12 C34 28 62 32 62 48 C62 64 34 68 34 82"/>
+            <path class="eclat-trait" stroke-width="9" d="M62 12 C62 28 34 32 34 48 C34 64 62 68 62 82"/>
+            <rect class="eclat" x="36" y="80" width="24" height="9" rx="4.5"/>
+          </svg>
+          <span class="mono"><svg class="mark" width="34" height="34" viewBox="0 0 96 96" aria-hidden="true">
+            <path class="trait" stroke-width="9" d="M34 12 C34 28 62 32 62 48 C62 64 34 68 34 82"/>
+            <path class="eclat-trait" stroke-width="9" d="M62 12 C62 28 34 32 34 48 C34 64 62 68 62 82"/></svg></span>
+          <span class="neg"><svg class="mark" width="28" height="28" viewBox="0 0 96 96" aria-hidden="true">
+            <path class="trait" stroke-width="10" d="M34 12 C34 28 62 32 62 48 C62 64 34 68 34 82"/>
+            <path class="eclat-trait" stroke-width="10" d="M62 12 C62 28 34 32 34 48 C34 64 62 68 62 82"/></svg></span>
+        </div>
+        <div><p class="nom" style="font-size:19px">La Tresse</p>
+          <p class="pourquoi">Deux mèches entrelacées : le savoir-faire, le lien entre toi et la
+            cliente. Très juste si tu proposes aussi la pose.</p>
+          <p class="handle">Tresse &amp; Toi · Racines &amp; Reines · Karité &amp; Kinky</p></div>
+      </button>
+
+      <button class="choix logo-carte" data-groupe="logo" data-valeur="Le Peigne"><span class="coche">✓</span>
+        <div class="vitrine">
+          <svg class="mark" width="60" height="60" viewBox="0 0 96 96" aria-label="Logo peigne afro">
+            <rect class="forme" x="18" y="14" width="7" height="34" rx="3.5"/>
+            <rect class="forme" x="32" y="14" width="7" height="34" rx="3.5"/>
+            <rect class="forme" x="46" y="14" width="7" height="34" rx="3.5"/>
+            <rect class="forme" x="60" y="14" width="7" height="34" rx="3.5"/>
+            <rect class="forme" x="74" y="14" width="7" height="34" rx="3.5"/>
+            <rect class="forme" x="14" y="44" width="71" height="10" rx="5"/>
+            <rect class="forme" x="44" y="54" width="11" height="26" rx="5"/>
+            <circle class="eclat" cx="49.5" cy="82" r="8"/>
+          </svg>
+          <span class="mono"><svg class="mark" width="34" height="34" viewBox="0 0 96 96" aria-hidden="true">
+            <rect class="forme" x="18" y="14" width="7" height="34" rx="3.5"/><rect class="forme" x="32" y="14" width="7" height="34" rx="3.5"/>
+            <rect class="forme" x="46" y="14" width="7" height="34" rx="3.5"/><rect class="forme" x="60" y="14" width="7" height="34" rx="3.5"/>
+            <rect class="forme" x="74" y="14" width="7" height="34" rx="3.5"/><rect class="forme" x="14" y="44" width="71" height="10" rx="5"/>
+            <rect class="forme" x="44" y="54" width="11" height="26" rx="5"/><circle class="eclat" cx="49.5" cy="82" r="8"/></svg></span>
+          <span class="neg"><svg class="mark" width="28" height="28" viewBox="0 0 96 96" aria-hidden="true">
+            <rect class="forme" x="18" y="14" width="8" height="34" rx="4"/><rect class="forme" x="35" y="14" width="8" height="34" rx="4"/>
+            <rect class="forme" x="52" y="14" width="8" height="34" rx="4"/><rect class="forme" x="69" y="14" width="8" height="34" rx="4"/>
+            <rect class="forme" x="14" y="44" width="67" height="10" rx="5"/><rect class="forme" x="42" y="54" width="11" height="24" rx="5"/></svg></span>
+        </div>
+        <div><p class="nom" style="font-size:19px">Le Peigne</p>
+          <p class="pourquoi">Le peigne afro : l'objet le plus chargé de sens du métier. Fort,
+            culturel, instantanément identifiable. Le plus audacieux de la planche.</p>
+          <p class="handle">Racines &amp; Reines · Fille de Reine · Karité &amp; Kinky</p></div>
+      </button>
+
+      <button class="choix logo-carte" data-groupe="logo" data-valeur="L'Arche"><span class="coche">✓</span>
+        <div class="vitrine">
+          <svg class="mark" width="60" height="60" viewBox="0 0 96 96" aria-label="Logo arche">
+            <path class="trait" stroke-width="9" d="M18 84 L18 46 A30 30 0 0 1 78 46 L78 84"/>
+            <path class="eclat-trait" stroke-width="7" d="M38 48 C44 56 32 62 38 72"/>
+            <path class="eclat-trait" stroke-width="7" d="M58 48 C64 56 52 62 58 72"/>
+          </svg>
+          <span class="mono"><svg class="mark" width="34" height="34" viewBox="0 0 96 96" aria-hidden="true">
+            <path class="trait" stroke-width="9" d="M18 84 L18 46 A30 30 0 0 1 78 46 L78 84"/>
+            <path class="eclat-trait" stroke-width="7" d="M38 48 C44 56 32 62 38 72"/>
+            <path class="eclat-trait" stroke-width="7" d="M58 48 C64 56 52 62 58 72"/></svg></span>
+          <span class="neg"><svg class="mark" width="28" height="28" viewBox="0 0 96 96" aria-hidden="true">
+            <path class="trait" stroke-width="10" d="M18 84 L18 46 A30 30 0 0 1 78 46 L78 84"/>
+            <path class="eclat-trait" stroke-width="8" d="M48 48 C54 58 42 64 48 76"/></svg></span>
+        </div>
+        <div><p class="nom" style="font-size:19px">L'Arche</p>
+          <p class="pourquoi">Une porte, une maison — et deux mèches ondulées à l'intérieur.
+            Institutionnel, rassurant, fait plus grand que la taille réelle.</p>
+          <p class="handle">Maison Kora · L'Atelier des Mèches · Perruque Prestige</p></div>
+      </button>
+
+      <button class="choix logo-carte" data-groupe="logo" data-valeur="Le Miroir"><span class="coche">✓</span>
+        <div class="vitrine">
+          <svg class="mark" width="60" height="60" viewBox="0 0 96 96" aria-label="Logo miroir">
+            <circle class="trait" cx="48" cy="38" r="27" stroke-width="8"/>
+            <circle class="eclat" cx="48" cy="38" r="15"/>
+            <rect class="forme" x="42" y="63" width="12" height="26" rx="6"/>
+          </svg>
+          <span class="mono"><svg class="mark" width="34" height="34" viewBox="0 0 96 96" aria-hidden="true">
+            <circle class="trait" cx="48" cy="38" r="27" stroke-width="8"/><circle class="eclat" cx="48" cy="38" r="15"/>
+            <rect class="forme" x="42" y="63" width="12" height="26" rx="6"/></svg></span>
+          <span class="neg"><svg class="mark" width="28" height="28" viewBox="0 0 96 96" aria-hidden="true">
+            <circle class="trait" cx="48" cy="38" r="28" stroke-width="9"/><circle class="eclat" cx="48" cy="38" r="14"/>
+            <rect class="forme" x="42" y="64" width="12" height="24" rx="6"/></svg></span>
+        </div>
+        <div><p class="nom" style="font-size:19px">Le Miroir</p>
+          <p class="pourquoi">Le moment qui compte vraiment : celle où la cliente se regarde.
+            Doux, féminin, et le rond central peut accueillir une photo.</p>
+          <p class="handle">Mèches &amp; Merveilles · Glow Hair Bar · Slay Studio</p></div>
+      </button>
+
+    </div>
+
+    <div class="carte" style="margin-top:24px">
+      <p class="mini">Comment juger un logo en 30 secondes</p>
+      <ul class="liste-check">
+        <li>Réduis-le à la taille d'un ongle. S'il devient une tache, il est trop détaillé.</li>
+        <li>Imprime-le en noir : il doit rester lisible sans couleur, c'est ce que verra le reçu.</li>
+        <li>Dessine-le de mémoire cinq minutes après l'avoir vu. Si tu n'y arrives pas, ta cliente non plus.</li>
+        <li>Il doit fonctionner en rond (photo de profil) <b>et</b> en bande (en-tête de reçu).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ MAQUETTE -->
+<section class="section" id="maquette">
+  <div class="enveloppe">
+    <p class="eyebrow">Décision 3</p>
+    <h2 class="titre-section">La maquette, écran par écran</h2>
+    <p class="chapeau">Voilà à quoi ressemblera l'application sur un téléphone. Les chiffres affichés
+      sont des exemples ; la structure, elle, est la proposition. Dis-moi ce qu'on garde, ce qu'on
+      enlève, ce qui manque.</p>
+
+    <div class="rail" style="margin-top:32px">
+
+      <!-- 1 · ACCUEIL -->
+      <div class="ecran-bloc">
+        <div class="tel"><div class="tel-ecran">
+          <div class="statut"><span>9:41</span><span>▮▮▮ ⌁ 84%</span></div>
+          <div class="corps">
+            <div class="entete-app"><div><b>Bonjour Sarah</b><small>Jeudi 14 août</small></div><div class="rond">BC</div></div>
+            <div class="tuile" style="background:var(--prune);border-color:transparent;color:var(--sur-prune)">
+              <div class="lbl" style="color:var(--sur-prune);opacity:.75">Encaissé aujourd'hui</div>
+              <div class="val" style="color:var(--sur-prune)">117 000 FCFA</div>
+              <div style="display:flex;justify-content:space-between;font-size:9.5px;opacity:.8;margin-top:3px">
+                <span>3 ventes</span><span>Bénéfice 41 500</span></div>
+            </div>
+            <div class="duo">
+              <div class="tuile"><div class="lbl">Mois</div><div class="val sm">1 284 000</div></div>
+              <div class="tuile"><div class="lbl">Bénéfice</div><div class="val sm" style="color:var(--ok)">+468 200</div></div>
+            </div>
+            <div class="tuile">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                <span class="lbl">Objectif du mois</span><span style="font-size:10px;font-weight:600">64%</span></div>
+              <div class="jauge"><i style="width:64%"></i></div>
+              <div style="font-size:9px;color:var(--texte-3);margin-top:4px">Il reste 716 000 FCFA à faire en 17 jours</div>
+            </div>
+            <div class="titre-bloc"><span>À surveiller</span></div>
+            <div class="rangee" style="border-color:var(--alerte)">
+              <div class="vignette" style="background:var(--alerte-fond)">⚠</div>
+              <div class="txt"><b>3 articles en stock bas</b><small>Indienne 24″ · Frontal 13x4 · Colle</small></div>
+            </div>
+            <div class="rangee" style="border-color:var(--danger)">
+              <div class="vignette" style="background:var(--danger-fond)">⏱</div>
+              <div class="txt"><b>1 impayé — 22 000 FCFA</b><small>Grâce Mbala · depuis 12 jours</small></div>
+              <span class="mini-badge dg">Relancer</span>
+            </div>
+            <div class="titre-bloc"><span>Dernières ventes</span><span>Tout voir</span></div>
+            <div class="rangee"><div class="vignette">👑</div>
+              <div class="txt"><b>Marina Kouassi</b><small>REC-2026-0002 · 2 articles</small></div>
+              <span class="montant">117 000</span></div>
+          </div>
+          <div class="nav"><div class="on"><i style="-webkit-mask-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M3 11 12 3l9 8v10H3z%22/%3E%3C/svg%3E');mask-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M3 11 12 3l9 8v10H3z%22/%3E%3C/svg%3E')"></i>Accueil</div>
+            <div><i style="-webkit-mask-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M4 4h16v16H4z%22/%3E%3C/svg%3E');mask-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M4 4h16v16H4z%22/%3E%3C/svg%3E')"></i>Stock</div>
+            <div><i style="-webkit-mask-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%2211%22/%3E%3C/svg%3E');mask-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%2211%22/%3E%3C/svg%3E')"></i>Vendre</div>
+            <div><i style="-webkit-mask-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Ccircle cx=%2212%22 cy=%228%22 r=%225%22/%3E%3Cpath d=%22M3 22c0-5 4-8 9-8s9 3 9 8z%22/%3E%3C/svg%3E');mask-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Ccircle cx=%2212%22 cy=%228%22 r=%225%22/%3E%3Cpath d=%22M3 22c0-5 4-8 9-8s9 3 9 8z%22/%3E%3C/svg%3E')"></i>Clients</div>
+            <div><i style="-webkit-mask-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M4 20V10h4v10zm6 0V4h4v16zm6 0v-7h4v7z%22/%3E%3C/svg%3E');mask-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M4 20V10h4v10zm6 0V4h4v16zm6 0v-7h4v7z%22/%3E%3C/svg%3E')"></i>Rapports</div>
+          </div>
+        </div></div>
+        <p class="legende"><b>Accueil</b><span>La question du matin — « combien j'ai fait, qu'est-ce qui cloche » — répondue sans scroller.</span></p>
+      </div>
+
+      <!-- 2 · NOUVELLE VENTE -->
+      <div class="ecran-bloc">
+        <div class="tel"><div class="tel-ecran">
+          <div class="statut"><span>9:41</span><span>▮▮▮ ⌁ 84%</span></div>
+          <div class="corps">
+            <div class="entete-app"><div><b>Nouvelle vente</b><small>Étape 1 — les articles</small></div><span class="mini-badge">Annuler</span></div>
+            <div class="champ-faux">🔍 Chercher : nom, longueur, référence…</div>
+            <div class="puces"><span class="on">Tout</span><span>Mèches</span><span>Perruques</span><span>Closure</span><span>Accessoires</span></div>
+            <div class="rangee"><div class="vignette">〰</div>
+              <div class="txt"><b>Mèche brésilienne Body Wave</b><small>18″ · Naturel 1B · stock 12</small></div>
+              <div style="text-align:right"><div class="montant">38 000</div><div class="mini-badge ok">+</div></div></div>
+            <div class="rangee" style="border-color:var(--prune)"><div class="vignette">👑</div>
+              <div class="txt"><b>Perruque Lace Frontal 13x4</b><small>22″ · 180% · stock 4</small></div>
+              <div style="text-align:right"><div class="montant">110 000</div><div class="mini-badge" style="background:var(--prune);color:var(--sur-prune)">1</div></div></div>
+            <div class="rangee"><div class="vignette">🌀</div>
+              <div class="txt"><b>Perruque Bob Curly</b><small>12″ · Brun 4 · stock 5</small></div>
+              <div style="text-align:right"><div class="montant">62 000</div><div class="mini-badge ok">+</div></div></div>
+            <div class="rangee"><div class="vignette">✦</div>
+              <div class="txt"><b>Colle waterproof Got2b</b><small>stock 14</small></div>
+              <div style="text-align:right"><div class="montant">7 000</div><div class="mini-badge" style="background:var(--prune);color:var(--sur-prune)">1</div></div></div>
+            <div class="rangee" style="opacity:.5"><div class="vignette">✂</div>
+              <div class="txt"><b>Mèche indienne Bone Straight</b><small>24″ · stock 2</small></div>
+              <span class="mini-badge al">Stock bas</span></div>
+            <div style="margin-top:auto"></div>
+            <div class="bouton" style="display:flex;justify-content:space-between;align-items:center">
+              <span>2 articles · 117 000 FCFA</span><span>Suivant →</span></div>
+          </div>
+        </div></div>
+        <p class="legende"><b>Choisir les articles</b><span>On tape, on ajoute. Le stock est affiché en direct : impossible de vendre ce qu'on n'a plus.</span></p>
+      </div>
+
+      <!-- 3 · PAIEMENT -->
+      <div class="ecran-bloc">
+        <div class="tel"><div class="tel-ecran">
+          <div class="statut"><span>9:41</span><span>▮▮▮ ⌁ 84%</span></div>
+          <div class="corps">
+            <div class="entete-app"><div><b>Encaisser</b><small>Étape 2 — le paiement</small></div><span class="mini-badge">← Retour</span></div>
+            <div class="champ-faux" style="color:var(--texte)">👤 Marina Kouassi · +225 07 00 00 00 02</div>
+            <div class="tuile">
+              <div style="display:flex;justify-content:space-between;padding:2px 0"><span>Perruque Lace Frontal 13x4</span><span class="montant">110 000</span></div>
+              <div style="display:flex;justify-content:space-between;padding:2px 0"><span>Colle waterproof</span><span class="montant">7 000</span></div>
+              <div class="sep" style="margin:6px 0"></div>
+              <div style="display:flex;justify-content:space-between;color:var(--texte-3)"><span>Remise</span><span class="montant">− 0</span></div>
+              <div style="display:flex;justify-content:space-between;color:var(--texte-3)"><span>Livraison</span><span class="montant">+ 0</span></div>
+              <div class="sep" style="margin:6px 0"></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline">
+                <b style="font-size:12px">Total</b><span class="val" style="font-family:var(--serif);font-size:19px;font-weight:700">117 000</span></div>
+            </div>
+            <div class="titre-bloc"><span>Moyen de paiement</span></div>
+            <div class="puces"><span>Espèces</span><span class="on">Mobile Money</span><span>Virement</span><span>Carte</span></div>
+            <div class="titre-bloc"><span>Montant reçu</span></div>
+            <div class="champ-faux" style="color:var(--texte);font-size:17px;font-weight:700;justify-content:space-between">
+              <span class="num">117 000</span><span class="mini-badge ok">Tout payé</span></div>
+            <div style="display:flex;gap:6px"><span class="mini-badge">Payé en 2 fois</span><span class="mini-badge">Ajouter une note</span></div>
+            <div style="margin-top:auto"></div>
+            <div class="bouton">Valider la vente et faire le reçu</div>
+          </div>
+        </div></div>
+        <p class="legende"><b>Encaisser</b><span>Le paiement partiel est prévu dès le départ : c'est la réalité du terrain, pas une option.</span></p>
+      </div>
+
+      <!-- 4 · REÇU -->
+      <div class="ecran-bloc">
+        <div class="tel"><div class="tel-ecran">
+          <div class="statut"><span>9:41</span><span>▮▮▮ ⌁ 84%</span></div>
+          <div class="corps" style="gap:8px">
+            <div class="entete-app"><div><b>Reçu prêt</b><small>REC-2026-0002</small></div><span class="mini-badge ok">✓ Enregistré</span></div>
+            <div style="background:#fff;color:#241823;border-radius:10px;padding:12px;font-size:9.5px;line-height:1.4;border:1px solid var(--bord)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #ddd;padding-bottom:7px">
+                <div><div style="font-family:var(--serif);font-weight:700;color:#6E1F46;font-size:12px">Belle Couronne</div>
+                  <div style="color:#8a7580;font-size:8px">La couronne qui vous ressemble</div></div>
+                <div style="text-align:right;color:#8a7580;font-size:8px">Douala<br>+237 6 90 00 00 00</div></div>
+              <div style="display:flex;justify-content:space-between;margin-top:7px">
+                <div><b>REÇU REC-2026-0002</b><br><span style="color:#8a7580">14/08/2026</span></div>
+                <div style="text-align:right">Marina Kouassi<br><span style="color:#8a7580">+225 07 00 00 00 02</span></div></div>
+              <div style="border-top:1px solid #ddd;margin-top:7px;padding-top:5px">
+                <div style="display:flex;justify-content:space-between"><span>Perruque Lace Frontal 22″ ×1</span><span>110 000</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Colle waterproof ×1</span><span>7 000</span></div></div>
+              <div style="display:flex;justify-content:space-between;border-top:2px solid #241823;border-bottom:2px solid #241823;margin-top:6px;padding:5px 0;font-weight:700;font-family:var(--serif);font-size:11px">
+                <span>TOTAL</span><span>117 000 FCFA</span></div>
+              <div style="display:flex;justify-content:space-between;background:#E4F1EA;color:#2F7D5B;padding:3px 6px;border-radius:5px;margin-top:5px;font-weight:700"><span>SOLDÉ — MERCI !</span><span>✓</span></div>
+              <div style="text-align:center;margin-top:8px;color:#6E1F46;font-family:var(--serif);font-size:9px">Merci pour votre confiance 💕</div>
+            </div>
+            <div class="puces" style="justify-content:center"><span class="on">A5 / A4</span><span>Ticket 80 mm</span></div>
+            <div style="margin-top:auto;display:grid;gap:7px">
+              <div class="bouton">🖨 Imprimer le reçu</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+                <div class="bouton fant">Envoyer en PDF</div>
+                <div class="bouton fant" style="border-color:var(--ok);color:var(--ok)">WhatsApp</div></div>
+            </div>
+          </div>
+        </div></div>
+        <p class="legende"><b>Le reçu</b><span>Aperçu réel avant impression. Trois sorties : papier, PDF, WhatsApp — le tout sans quitter l'écran.</span></p>
+      </div>
+
+      <!-- 5 · STOCK -->
+      <div class="ecran-bloc">
+        <div class="tel"><div class="tel-ecran">
+          <div class="statut"><span>9:41</span><span>▮▮▮ ⌁ 84%</span></div>
+          <div class="corps">
+            <div class="entete-app"><div><b>Mon stock</b><small>68 articles · valeur 1 940 000</small></div><div class="rond">+</div></div>
+            <div class="champ-faux">🔍 Chercher un article…</div>
+            <div class="puces"><span class="on">Tout</span><span>Stock bas 3</span><span>Rupture 1</span><span>Mèches</span><span>Perruques</span></div>
+            <div class="rangee"><div class="vignette">〰</div>
+              <div class="txt"><b>Mèche brésilienne Body Wave</b><small>18″ · 1B · marge 16 000</small></div>
+              <div style="text-align:right"><div class="montant">12</div><div class="mini-badge ok">OK</div></div></div>
+            <div class="rangee" style="border-color:var(--alerte)"><div class="vignette">✂</div>
+              <div class="txt"><b>Mèche indienne Bone Straight</b><small>24″ · seuil 3 · marge 22 000</small></div>
+              <div style="text-align:right"><div class="montant" style="color:var(--alerte)">2</div><div class="mini-badge al">Bas</div></div></div>
+            <div class="rangee"><div class="vignette">👑</div>
+              <div class="txt"><b>Perruque Lace Frontal 13x4</b><small>22″ · 180% · marge 45 000</small></div>
+              <div style="text-align:right"><div class="montant">4</div><div class="mini-badge ok">OK</div></div></div>
+            <div class="rangee" style="border-color:var(--danger)"><div class="vignette">◇</div>
+              <div class="txt"><b>Frontal 13x4 Transparent</b><small>18″ · dernier vendu il y a 2 j</small></div>
+              <div style="text-align:right"><div class="montant" style="color:var(--danger)">0</div><div class="mini-badge dg">Rupture</div></div></div>
+            <div class="rangee"><div class="vignette">🌀</div>
+              <div class="txt"><b>Perruque Bob Curly</b><small>12″ · Brun 4 · marge 27 000</small></div>
+              <div style="text-align:right"><div class="montant">5</div><div class="mini-badge ok">OK</div></div></div>
+            <div class="rangee"><div class="vignette">✦</div>
+              <div class="txt"><b>Bonnet perruque en soie</b><small>marge 1 800</small></div>
+              <div style="text-align:right"><div class="montant">24</div><div class="mini-badge ok">OK</div></div></div>
+          </div>
+        </div></div>
+        <p class="legende"><b>Le stock</b><span>Trié par urgence, pas par ordre alphabétique. Ce qui manque remonte tout seul.</span></p>
+      </div>
+
+      <!-- 6 · FICHE ARTICLE -->
+      <div class="ecran-bloc">
+        <div class="tel"><div class="tel-ecran">
+          <div class="statut"><span>9:41</span><span>▮▮▮ ⌁ 84%</span></div>
+          <div class="corps">
+            <div class="entete-app"><div><b>Fiche article</b><small>ART-004</small></div><span class="mini-badge">Modifier</span></div>
+            <div style="height:96px;border-radius:12px;background:linear-gradient(135deg,var(--surface-3),var(--rose));display:grid;place-items:center;font-size:34px">👑</div>
+            <div><b style="font-size:14px;font-family:var(--sans)">Perruque Lace Frontal 13x4</b>
+              <div style="color:var(--texte-3);font-size:10px">Brésilien · Lisse · 22″ · Naturel 1B · 180%</div></div>
+            <div class="duo">
+              <div class="tuile"><div class="lbl">Prix d'achat</div><div class="val sm">65 000</div></div>
+              <div class="tuile"><div class="lbl">Prix de vente</div><div class="val sm">110 000</div></div>
+            </div>
+            <div class="tuile" style="background:var(--ok-fond);border-color:transparent">
+              <div class="lbl" style="color:var(--ok)">Marge par pièce</div>
+              <div class="val" style="color:var(--ok)">45 000 <span style="font-size:11px;font-family:var(--sans)">· 41%</span></div></div>
+            <div class="duo">
+              <div class="tuile"><div class="lbl">En stock</div><div class="val sm">4</div></div>
+              <div class="tuile"><div class="lbl">Vendus (30 j)</div><div class="val sm">6</div></div>
+            </div>
+            <div class="titre-bloc"><span>Mouvements</span></div>
+            <div class="rangee"><div class="txt"><b>Vente REC-2026-0002</b><small>14/08 · Marina K.</small></div><span class="montant" style="color:var(--danger)">−1</span></div>
+            <div class="rangee"><div class="txt"><b>Arrivage Guangzhou</b><small>02/08 · lot #12</small></div><span class="montant" style="color:var(--ok)">+5</span></div>
+            <div class="rangee"><div class="txt"><b>Vente REC-2026-0001</b><small>29/07 · Aïcha N.</small></div><span class="montant" style="color:var(--danger)">−2</span></div>
+          </div>
+        </div></div>
+        <p class="legende"><b>Fiche article</b><span>La marge est calculée toute seule. C'est le chiffre qui dit quoi racheter — et quoi arrêter.</span></p>
+      </div>
+
+      <!-- 7 · CLIENTE -->
+      <div class="ecran-bloc">
+        <div class="tel"><div class="tel-ecran">
+          <div class="statut"><span>9:41</span><span>▮▮▮ ⌁ 84%</span></div>
+          <div class="corps">
+            <div class="entete-app"><div><b>Grâce Mbala</b><small>Cliente depuis mars 2026 · Yaoundé</small></div><div class="rond">GM</div></div>
+            <div class="duo">
+              <div class="tuile"><div class="lbl">Total dépensé</div><div class="val sm">186 000</div></div>
+              <div class="tuile"><div class="lbl">Commandes</div><div class="val sm">4</div></div>
+            </div>
+            <div class="tuile" style="background:var(--alerte-fond);border-color:transparent">
+              <div class="lbl" style="color:var(--alerte)">Reste à payer</div>
+              <div class="val" style="color:var(--alerte)">22 000 FCFA</div>
+              <div style="font-size:9px;color:var(--alerte);opacity:.85;margin-top:2px">Depuis 12 jours · REC-2026-0003</div></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+              <div class="bouton fant" style="border-color:var(--ok);color:var(--ok)">Relancer</div>
+              <div class="bouton fant">Appeler</div></div>
+            <div class="titre-bloc"><span>Historique</span></div>
+            <div class="rangee"><div class="vignette">🌀</div>
+              <div class="txt"><b>REC-2026-0003</b><small>12/08 · Bob Curly + pose</small></div>
+              <div style="text-align:right"><div class="montant">72 000</div><div class="mini-badge al">Partiel</div></div></div>
+            <div class="rangee"><div class="vignette">〰</div>
+              <div class="txt"><b>REC-2026-0009</b><small>04/06 · Body Wave 18″ ×2</small></div>
+              <div style="text-align:right"><div class="montant">76 000</div><div class="mini-badge ok">Payé</div></div></div>
+            <div class="tuile"><div class="lbl">Note</div>
+              <div style="font-size:10.5px;margin-top:3px">Préfère le 1B, jamais de blond. Paie souvent en deux fois. Anniversaire le 3 octobre.</div></div>
+          </div>
+        </div></div>
+        <p class="legende"><b>Fiche cliente</b><span>Le solde dû et le motif de relance en haut. Les préférences en bas — c'est ce qui fait revenir.</span></p>
+      </div>
+
+      <!-- 8 · RAPPORTS -->
+      <div class="ecran-bloc">
+        <div class="tel"><div class="tel-ecran">
+          <div class="statut"><span>9:41</span><span>▮▮▮ ⌁ 84%</span></div>
+          <div class="corps">
+            <div class="entete-app"><div><b>Rapports</b><small>6 derniers mois</small></div><span class="mini-badge">Exporter</span></div>
+            <div class="puces"><span>7 j</span><span>30 j</span><span class="on">6 mois</span><span>Année</span></div>
+            <div class="tuile">
+              <div class="lbl">Chiffre d'affaires</div><div class="val">6 420 000 FCFA</div>
+              <div style="font-size:9.5px;color:var(--ok);margin-top:2px">▲ 18% vs période précédente</div>
+              <div class="histo" style="margin-top:12px">
+                <div style="height:42%" data-m="mar"></div><div style="height:58%" data-m="avr"></div>
+                <div style="height:51%" data-m="mai"></div><div style="height:74%" data-m="jun"></div>
+                <div style="height:66%" data-m="jul"></div><div class="on" style="height:92%" data-m="aoû"></div>
+              </div>
+              <div style="height:16px"></div>
+            </div>
+            <div class="duo">
+              <div class="tuile"><div class="lbl">Bénéfice net</div><div class="val sm" style="color:var(--ok)">2 118 000</div></div>
+              <div class="tuile"><div class="lbl">Panier moyen</div><div class="val sm">74 600</div></div>
+            </div>
+            <div class="titre-bloc"><span>Ce qui rapporte le plus</span></div>
+            <div class="rangee"><div class="txt"><b>Perruque Lace Frontal 13x4</b><small>14 vendues</small></div><span class="montant" style="color:var(--ok)">+630 000</span></div>
+            <div class="rangee"><div class="txt"><b>Mèche indienne 24″</b><small>19 vendues</small></div><span class="montant" style="color:var(--ok)">+418 000</span></div>
+            <div class="rangee" style="opacity:.6"><div class="txt"><b>Perruque synthétique Afro</b><small>3 vendues · 4 mois de stock</small></div><span class="montant">+27 000</span></div>
+            <div class="titre-bloc"><span>D'où viennent les ventes</span></div>
+            <div class="puces"><span class="on">WhatsApp 46%</span><span>Instagram 31%</span><span>Boutique 18%</span></div>
+          </div>
+        </div></div>
+        <p class="legende"><b>Rapports</b><span>Pas seulement « combien j'ai vendu » : <b>ce qui rapporte</b>, et ce qui dort en stock depuis quatre mois.</span></p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ REÇU -->
+<section class="section" id="recu">
+  <div class="enveloppe">
+    <p class="eyebrow">La pièce maîtresse</p>
+    <h2 class="titre-section">Le reçu, en vrai</h2>
+    <p class="chapeau">C'est la demande la plus importante : pouvoir remettre ou imprimer un reçu à
+      chaque vente. Deux formats sont prévus, pour deux réalités.</p>
+
+    <div class="papiers" style="margin-top:34px">
+      <div>
+        <div class="papier a5">
+          <div class="haut">
+            <div style="display:flex;gap:10px;align-items:center">
+              <svg class="mark" width="40" height="40" viewBox="0 0 96 96" style="--logo-1:#6E1F46;--logo-2:#A9732E" aria-hidden="true">
+                <path class="forme" d="M14 68 L20 30 C24 40 30 46 34 46 C40 46 42 22 48 22 C54 22 56 46 62 46 C66 46 72 40 76 30 L82 68 Z"/>
+                <rect class="forme" x="14" y="71" width="68" height="9" rx="4.5"/>
+                <circle class="eclat" cx="48" cy="18" r="4.5"/></svg>
+              <div><h4>Belle Couronne</h4>
+                <div style="font-size:9px;color:#8a7580;font-style:italic">La couronne qui vous ressemble</div></div>
+            </div>
+            <div class="coord">Akwa, Douala<br>+237 6 90 00 00 00<br>@bellecouronne</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;background:#FBF5F7;border-radius:8px;padding:9px 11px;margin-top:11px">
+            <div><div style="font-family:var(--serif);font-weight:700;font-size:13px">REÇU N° REC-2026-0002</div>
+              <div style="color:#6b5560;font-size:9.5px">Date : 14/08/2026 · Canal : Boutique</div></div>
+            <div style="text-align:right"><b style="font-size:10px">Client</b><br>Marina Kouassi<br>
+              <span style="color:#6b5560;font-size:9px">+225 07 00 00 00 02</span></div>
+          </div>
+          <table>
+            <thead><tr><th>Article</th><th style="text-align:center">Qté</th><th style="text-align:right">P.U.</th><th style="text-align:right">Total</th></tr></thead>
+            <tbody>
+              <tr><td><b>Perruque Lace Frontal 13x4</b><div class="det">Brésilien · Lisse · 22″ · 1B · 180%</div></td>
+                <td style="text-align:center" class="num">1</td><td style="text-align:right" class="num">110 000</td><td style="text-align:right" class="num">110 000</td></tr>
+              <tr><td><b>Colle waterproof Got2b</b><div class="det">Tenue longue durée</div></td>
+                <td style="text-align:center" class="num">1</td><td style="text-align:right" class="num">7 000</td><td style="text-align:right" class="num">7 000</td></tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;margin-top:9px">
+            <div style="width:60%">
+              <div class="tot"><span style="color:#6b5560">Sous-total</span><span class="num">117 000</span></div>
+              <div class="tot"><span style="color:#6b5560">Remise</span><span class="num">− 0</span></div>
+              <div class="tot"><span style="color:#6b5560">Livraison</span><span class="num">+ 0</span></div>
+              <div class="grand"><span>TOTAL</span><span class="num">117 000 FCFA</span></div>
+              <div class="tot" style="margin-top:4px"><span style="color:#6b5560">Payé — Mobile Money</span><span class="num">117 000</span></div>
+              <div style="display:flex;justify-content:space-between;background:#E4F1EA;color:#2F7D5B;padding:5px 8px;border-radius:6px;font-weight:700;margin-top:6px;font-size:10.5px">
+                <span>SOLDÉ — MERCI !</span><span>✓</span></div>
+            </div>
+          </div>
+          <div class="pied"><b>Merci pour votre confiance 💕</b>
+            <small>Échange possible sous 48 h sur présentation du reçu, article non porté et emballage d'origine.</small></div>
+        </div>
+        <p class="etq-papier">Format A5 / A4 — imprimante de bureau ou PDF</p>
+      </div>
+
+      <div>
+        <div class="papier ticket">
+          <div class="haut">
+            <svg class="mark" width="34" height="34" viewBox="0 0 96 96" style="--logo-1:#6E1F46;--logo-2:#A9732E" aria-hidden="true">
+              <path class="forme" d="M14 68 L20 30 C24 40 30 46 34 46 C40 46 42 22 48 22 C54 22 56 46 62 46 C66 46 72 40 76 30 L82 68 Z"/>
+              <rect class="forme" x="14" y="71" width="68" height="9" rx="4.5"/></svg>
+            <h4>Belle Couronne</h4>
+            <div class="coord">Akwa, Douala · +237 6 90 00 00 00</div>
+          </div>
+          <div style="margin-top:8px;text-align:center">
+            <div style="font-family:var(--serif);font-weight:700;font-size:11px">REÇU REC-2026-0002</div>
+            <div style="color:#6b5560;font-size:8.5px">14/08/2026 · Marina Kouassi</div>
+          </div>
+          <table>
+            <thead><tr><th>Article</th><th style="text-align:center">Q</th><th style="text-align:right">Total</th></tr></thead>
+            <tbody>
+              <tr><td><b>Perruque Lace Frontal</b><div class="det">22″ · 110 000 / u.</div></td>
+                <td style="text-align:center" class="num">1</td><td style="text-align:right" class="num">110 000</td></tr>
+              <tr><td><b>Colle waterproof</b><div class="det">7 000 / u.</div></td>
+                <td style="text-align:center" class="num">1</td><td style="text-align:right" class="num">7 000</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:8px">
+            <div class="tot"><span style="color:#6b5560">Sous-total</span><span class="num">117 000</span></div>
+            <div class="grand" style="font-size:12px"><span>TOTAL</span><span class="num">117 000</span></div>
+            <div class="tot" style="margin-top:3px"><span style="color:#6b5560">Mobile Money</span><span class="num">117 000</span></div>
+            <div style="display:flex;justify-content:space-between;background:#E4F1EA;color:#2F7D5B;padding:4px 6px;border-radius:5px;font-weight:700;margin-top:5px;font-size:9.5px">
+              <span>SOLDÉ — MERCI !</span><span>✓</span></div>
+          </div>
+          <div class="pied"><b>Merci 💕</b><small>Échange sous 48 h avec ce reçu.</small></div>
+        </div>
+        <p class="etq-papier">Ticket 80 mm — imprimante thermique Bluetooth</p>
+      </div>
+    </div>
+
+    <div class="grille g3" style="margin-top:36px">
+      <div class="carte"><p class="mini">Papier</p>
+        <p style="margin-top:8px;color:var(--texte-2);font-size:14.5px">L'app envoie directement à
+          l'imprimante du téléphone (Wi-Fi, AirPrint) ou à une petite thermique Bluetooth posée
+          sur le comptoir. Le ticket sort en quatre secondes.</p></div>
+      <div class="carte"><p class="mini">PDF</p>
+        <p style="margin-top:8px;color:var(--texte-2);font-size:14.5px">Un fichier propre, nommé
+          <code style="font-family:var(--mono);font-size:12.5px">REC-2026-0002.pdf</code>, à
+          archiver ou à envoyer par mail. C'est ta preuve en cas de litige.</p></div>
+      <div class="carte"><p class="mini">WhatsApp</p>
+        <p style="margin-top:8px;color:var(--texte-2);font-size:14.5px">Un bouton, la conversation
+          de la cliente s'ouvre avec le reçu en pièce jointe. C'est ainsi que passeront 80% de tes
+          reçus, et c'est gratuit.</p></div>
+    </div>
+
+    <div class="carte" style="margin-top:16px">
+      <p class="mini">Ce que le reçu doit contenir, toujours</p>
+      <ul class="liste-check">
+        <li>Nom commercial, ville et un numéro de téléphone joignable.</li>
+        <li>Un <b>numéro unique et continu</b> — <code style="font-family:var(--mono);font-size:13px">REC-2026-0001</code>, puis 0002… jamais deux fois le même, jamais de trou.</li>
+        <li>La date, le détail des articles avec longueur et couleur, la quantité et le prix unitaire.</li>
+        <li>Le total, le montant payé, le moyen de paiement, et <b>le reste à payer</b> s'il y en a un.</li>
+        <li>La politique d'échange. C'est elle qui coupe court aux discussions trois semaines plus tard.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ FONCTIONS -->
+<section class="section" id="fonctions">
+  <div class="enveloppe">
+    <p class="eyebrow">Décision 4</p>
+    <h2 class="titre-section">Ce que l'app fait au premier jour</h2>
+    <p class="chapeau">Ma proposition de première version. Coche ce que tu gardes, décoche ce dont tu
+      n'as pas besoin — moins il y a de fonctions, plus vite tu l'as entre les mains.</p>
+
+    <h3 style="margin:32px 0 14px;font-size:20px">Version 1 — le socle</h3>
+    <div class="fonctions">
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Catalogue produits"><span class="case">✓</span>
+        <span><b>Catalogue produits</b><span>Mèches, perruques, closures, accessoires, soins et services de pose. Avec photo, longueur, texture, couleur, origine et densité.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Stock et alertes"><span class="case">✓</span>
+        <span><b>Stock et alertes</b><span>Quantité en direct, seuil d'alerte par article, écran des ruptures. Le stock baisse tout seul à chaque vente.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Prix d'achat et marge"><span class="case">✓</span>
+        <span><b>Prix d'achat et marge automatique</b><span>Tu saisis ce que ça t'a coûté et ce que tu vends : l'app calcule le bénéfice, par article et au total.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Vente multi-articles"><span class="case">✓</span>
+        <span><b>Vente à plusieurs articles</b><span>Panier, remise par ligne ou sur le total, frais de livraison. Une vente = un reçu, quel que soit le nombre d'articles.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Paiement partiel"><span class="case">✓</span>
+        <span><b>Paiement partiel et suivi des impayés</b><span>Acompte aujourd'hui, solde plus tard. L'app garde le compte et te dit qui doit combien, depuis combien de jours.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Reçu imprimable"><span class="case">✓</span>
+        <span><b>Reçu numéroté, imprimable, en PDF et sur WhatsApp</b><span>A5 pour l'imprimante de bureau, ticket 80 mm pour la thermique. La demande centrale du projet.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Fiches clientes"><span class="case">✓</span>
+        <span><b>Fiches clientes</b><span>Contact, historique d'achats, total dépensé, solde dû, préférences et anniversaire.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Dépenses"><span class="case">✓</span>
+        <span><b>Dépenses</b><span>Marchandise, fret, douane, publicité, loyer, emballage. Sans elles, le « bénéfice » est un mensonge.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Tableau de bord"><span class="case">✓</span>
+        <span><b>Tableau de bord et objectif du mois</b><span>Encaissé du jour, du mois, bénéfice, progression vers l'objectif, alertes.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Rapports"><span class="case">✓</span>
+        <span><b>Rapports</b><span>CA et bénéfice par période, articles les plus rentables, meilleures clientes, canal de vente le plus efficace.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Hors-ligne"><span class="case">✓</span>
+        <span><b>Fonctionne sans internet</b><span>Tout est stocké dans le téléphone. Ni abonnement, ni coupure de réseau qui t'empêche de vendre.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Sauvegarde"><span class="case">✓</span>
+        <span><b>Sauvegarde et restauration</b><span>Un fichier à envoyer sur ton propre WhatsApp ou Drive. Téléphone perdu ≠ business perdu.</span></span></button>
+      <button class="fonction" aria-pressed="true" data-groupe="v1" data-valeur="Multi-devise"><span class="case">✓</span>
+        <span><b>Ta devise</b><span>FCFA, euro, dollar, cédi, naira — au choix, avec le bon format de nombre.</span></span></button>
+    </div>
+
+    <h3 style="margin:36px 0 14px;font-size:20px">Plus tard — quand le business tourne</h3>
+    <div class="fonctions">
+      <button class="fonction" data-groupe="v2" data-valeur="Imprimante thermique Bluetooth"><span class="case">✓</span>
+        <span><b>Imprimante thermique Bluetooth</b><span>Le petit boîtier à 25 000 FCFA qui sort le ticket 58 ou 80 mm en quatre secondes.</span></span></button>
+      <button class="fonction" data-groupe="v2" data-valeur="Relances automatiques"><span class="case">✓</span>
+        <span><b>Relances d'impayés en un clic</b><span>Message WhatsApp pré-rédigé, poli, avec le montant et le numéro du reçu.</span></span></button>
+      <button class="fonction" data-groupe="v2" data-valeur="Commandes et arrivages"><span class="case">✓</span>
+        <span><b>Commandes clientes et arrivages</b><span>Précommandes payées d'avance, suivi du conteneur, et le fret + la douane répartis sur le coût réel de chaque pièce.</span></span></button>
+      <button class="fonction" data-groupe="v2" data-valeur="Fidélité"><span class="case">✓</span>
+        <span><b>Programme de fidélité</b><span>La dixième pose offerte, ou une remise automatique au-delà d'un certain montant cumulé.</span></span></button>
+      <button class="fonction" data-groupe="v2" data-valeur="Catalogue partageable"><span class="case">✓</span>
+        <span><b>Catalogue partageable</b><span>Une image ou un lien à envoyer en statut WhatsApp, généré depuis ton stock réel.</span></span></button>
+      <button class="fonction" data-groupe="v2" data-valeur="Sauvegarde cloud"><span class="case">✓</span>
+        <span><b>Sauvegarde en ligne et deuxième téléphone</b><span>Tes données synchronisées, pour travailler à deux ou changer d'appareil sans rien perdre.</span></span></button>
+      <button class="fonction" data-groupe="v2" data-valeur="Plusieurs vendeuses"><span class="case">✓</span>
+        <span><b>Plusieurs vendeuses</b><span>Chacune son code, chaque vente signée, et le rapport par vendeuse à la fin du mois.</span></span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ FLUTTER -->
+<section class="section" id="flutter">
+  <div class="enveloppe">
+    <p class="eyebrow">Le chantier</p>
+    <h2 class="titre-section">Comment on la construit en Flutter</h2>
+    <p class="chapeau">Un seul code source, deux applications : Android et iPhone. Voici les choix
+      techniques que je recommande — ils sont tous éprouvés et gratuits.</p>
+
+    <div class="tableau-enrobage" style="margin-top:28px">
+      <table class="tech">
+        <thead><tr><th>Besoin</th><th>Solution</th><th>Pourquoi celle-là</th></tr></thead>
+        <tbody>
+          <tr><td>Base de données locale</td><td><code>drift</code> (SQLite)</td>
+            <td>Marche sans internet, et le SQL rend les rapports faciles à calculer même avec des milliers de ventes.</td></tr>
+          <tr><td>Organisation de l'app</td><td><code>flutter_riverpod</code></td>
+            <td>La référence actuelle pour tenir l'état d'une app Flutter proprement quand elle grandit.</td></tr>
+          <tr><td>Reçu PDF &amp; impression</td><td><code>pdf</code> + <code>printing</code></td>
+            <td>Le duo standard : il fabrique le A5, montre l'aperçu, et parle à l'imprimante ou à AirPrint.</td></tr>
+          <tr><td>Ticket thermique</td><td><code>esc_pos_utils_plus</code> + <code>print_bluetooth_thermal</code></td>
+            <td>Pilote les imprimantes 58 et 80 mm du marché en Bluetooth, sans matériel propriétaire.</td></tr>
+          <tr><td>Envoi WhatsApp</td><td><code>share_plus</code> + <code>url_launcher</code></td>
+            <td>Partage le PDF dans n'importe quelle app, ou ouvre directement la conversation via <code>wa.me</code>.</td></tr>
+          <tr><td>Graphiques</td><td><code>fl_chart</code></td>
+            <td>Léger, joli, et il se colore avec la palette de la marque.</td></tr>
+          <tr><td>Photos d'articles</td><td><code>image_picker</code> + <code>path_provider</code></td>
+            <td>Photo prise avec l'appareil et rangée dans l'app, compressée pour ne pas gonfler le téléphone.</td></tr>
+          <tr><td>Polices de la marque</td><td><code>google_fonts</code></td>
+            <td>La typographie choisie plus haut, embarquée dans l'app.</td></tr>
+          <tr><td>Français &amp; devises</td><td><code>intl</code> + <code>flutter_localizations</code></td>
+            <td>Dates et montants au format local. Les montants stockés en <b>centimes entiers</b> — jamais en décimal, pour éviter les erreurs d'arrondi sur l'argent.</td></tr>
+          <tr><td>Sauvegarde</td><td><code>file_picker</code> + export JSON</td>
+            <td>Un fichier que tu maîtrises, que tu peux t'envoyer à toi-même et réimporter n'importe quand.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grille g2" style="margin-top:24px">
+      <div class="carte">
+        <p class="mini">Les tables de la base</p>
+        <ul class="liste-check">
+          <li><b>produits</b> — référence, nom, catégorie, texture, longueur, couleur, origine, densité, prix d'achat, prix de vente, stock, seuil, photo</li>
+          <li><b>clients</b> — nom, téléphone, WhatsApp, ville, note, anniversaire</li>
+          <li><b>fournisseurs</b> — nom, pays, contact, délai</li>
+          <li><b>ventes</b> — numéro, date, cliente, remise, livraison, moyen de paiement, montant payé, statut, canal</li>
+          <li><b>lignes_vente</b> — article, quantité, prix unitaire, <b>coût d'achat figé</b> (pour que la marge d'hier reste juste si tu changes le prix demain)</li>
+          <li><b>depenses</b> — date, catégorie, libellé, montant</li>
+          <li><b>mouvements_stock</b> — entrée, vente, retour, perte, ajustement</li>
+          <li><b>parametres</b> — marque, logo, devise, préfixe et compteur de reçus, message, politique d'échange</li>
+        </ul>
+      </div>
+      <div class="carte">
+        <p class="mini">Trois règles que je poserai dans le code</p>
+        <ul class="liste-check">
+          <li><b>L'argent en entiers.</b> Tout est stocké en centimes. Les décimaux font perdre un franc de temps en temps — inacceptable sur une caisse.</li>
+          <li><b>Le coût figé sur la ligne.</b> Chaque ligne de vente garde le prix d'achat du jour. Sinon un réapprovisionnement plus cher réécrirait toute ton histoire de marges.</li>
+          <li><b>Aucune suppression de vente.</b> On annule, on ne détruit pas : le numéro de reçu reste réservé et la piste comptable reste continue.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="margin:36px 0 6px;font-size:20px">L'ordre de construction</h3>
+    <p style="color:var(--texte-2);margin-bottom:14px">Chaque étape donne une app installable et utilisable. Tu peux t'arrêter, tester, corriger le tir.</p>
+    <div class="etapes">
+      <div class="etape"><span class="no">Étape 1</span>
+        <div><b>Le socle et le stock</b><p>Base de données, thème de la marque, catalogue, saisie des articles, mouvements de stock, alertes. À la fin : tu peux déjà remplacer ton cahier.</p></div></div>
+      <div class="etape"><span class="no">Étape 2</span>
+        <div><b>La vente et le reçu</b><p>Panier, remises, encaissement, paiement partiel, numérotation, reçu A5 et ticket, PDF, impression, WhatsApp. C'est le cœur : le reste sert celui-là.</p></div></div>
+      <div class="etape"><span class="no">Étape 3</span>
+        <div><b>Les clientes et les dépenses</b><p>Fiches, historiques, soldes dus, relances. Puis les dépenses, pour que le bénéfice affiché soit le vrai.</p></div></div>
+      <div class="etape"><span class="no">Étape 4</span>
+        <div><b>Le tableau de bord et les rapports</b><p>Chiffres du jour et du mois, objectif, graphiques, articles rentables, canaux de vente.</p></div></div>
+      <div class="etape"><span class="no">Étape 5</span>
+        <div><b>Finitions et livraison</b><p>Sauvegarde et restauration, icône, écran d'accueil, tests sur un vrai téléphone, puis le fichier APK à installer — et la mise sur le Play Store si tu le souhaites.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ CHOIX -->
+<section class="section" id="choix">
+  <div class="enveloppe">
+    <p class="eyebrow">Pour finir</p>
+    <h2 class="titre-section">Tes choix</h2>
+    <p class="chapeau">Ce qui suit se remplit au fur et à mesure de tes clics dans la page. Quand
+      c'est complet, copie le résumé et renvoie-le moi : je lance la construction.</p>
+
+    <div class="recap" style="margin-top:26px">
+      <div class="recap-ligne"><span class="k">Nom du business</span><span class="v vide" data-recap="nom">à choisir dans la première section</span></div>
+      <div class="recap-ligne"><span class="k">Palette</span><span class="v vide" data-recap="palette">à choisir</span></div>
+      <div class="recap-ligne"><span class="k">Piste de logo</span><span class="v vide" data-recap="logo">à choisir</span></div>
+      <div class="recap-ligne"><span class="k">Fonctions version 1</span><span class="v" data-recap="v1">13 fonctions retenues</span></div>
+      <div class="recap-ligne"><span class="k">Fonctions plus tard</span><span class="v vide" data-recap="v2">aucune pour l'instant</span></div>
+      <div class="actions">
+        <button class="act plein" id="btn-copier">Copier le résumé</button>
+        <button class="act" id="btn-voir">Afficher le texte</button>
+      </div>
+      <textarea id="sortie" readonly aria-label="Résumé de tes choix"></textarea>
+    </div>
+
+    <div class="carte" style="margin-top:20px">
+      <p class="mini">Ce qu'il me faudra en plus pour démarrer</p>
+      <ul class="liste-check">
+        <li>Ta <b>devise</b> et ta ville, pour le format des montants et l'en-tête du reçu.</li>
+        <li>Ton <b>numéro de téléphone et WhatsApp</b>, tels qu'ils doivent apparaître sur le reçu.</li>
+        <li>Le <b>message de remerciement</b> et ta <b>politique d'échange</b>, avec tes mots à toi.</li>
+        <li>Une <b>photo de tes articles</b> réels, ou juste ta liste de prix : je pré-remplis le catalogue.</li>
+        <li>As-tu déjà une <b>imprimante</b> ? Laquelle ? Cela décide de la priorité du ticket thermique.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="fin">
+  <div class="enveloppe">
+    <p>Planche de proposition — mèches &amp; perruques. Rien n'est encore codé : les écrans
+      ci-dessus sont des maquettes. L'application sera développée en Flutter après tes choix.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var etat = {nom:null, palette:null, logo:null, v1:[], v2:[]};
+
+  // Fonctions cochées par défaut au chargement
+  document.querySelectorAll('.fonction[aria-pressed="true"]').forEach(function(b){
+    etat[b.dataset.groupe].push(b.dataset.valeur);
+  });
+
+  function texteDe(el){ return el.dataset.valeur.replace(/&amp;/g,'&'); }
+
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-groupe]');
+    if(!b) return;
+    var g = b.dataset.groupe, v = texteDe(b);
+
+    if(g === 'v1' || g === 'v2'){
+      var actif = b.getAttribute('aria-pressed') === 'true';
+      b.setAttribute('aria-pressed', String(!actif));
+      etat[g] = actif ? etat[g].filter(function(x){return x !== v}) : etat[g].concat([v]);
+    } else {
+      var deja = b.getAttribute('aria-pressed') === 'true';
+      document.querySelectorAll('[data-groupe="'+g+'"]').forEach(function(o){
+        o.setAttribute('aria-pressed','false');
+      });
+      if(!deja){ b.setAttribute('aria-pressed','true'); etat[g] = v; }
+      else { etat[g] = null; }
+    }
+    rendre();
+  });
+
+  function poser(cle, texte, vide){
+    var el = document.querySelector('[data-recap="'+cle+'"]');
+    if(!el) return;
+    el.textContent = texte || vide;
+    el.classList.toggle('vide', !texte);
+  }
+
+  function rendre(){
+    poser('nom', etat.nom, 'à choisir dans la première section');
+    poser('palette', etat.palette, 'à choisir');
+    poser('logo', etat.logo, 'à choisir');
+    poser('v1', etat.v1.length ? etat.v1.length + ' fonctions retenues' : null, 'aucune — dis-moi ce que tu veux');
+    poser('v2', etat.v2.length ? etat.v2.length + ' fonctions pour plus tard' : null, 'aucune pour l\'instant');
+    document.getElementById('sortie').value = resume();
+  }
+
+  function resume(){
+    var l = ['MES CHOIX — application mèches & perruques', ''];
+    l.push('Nom du business : ' + (etat.nom || '(à décider)'));
+    l.push('Palette : ' + (etat.palette || '(à décider)'));
+    l.push('Logo : ' + (etat.logo || '(à décider)'));
+    l.push('');
+    l.push('Version 1 (' + etat.v1.length + ') :');
+    etat.v1.forEach(function(x){ l.push('  - ' + x) });
+    if(!etat.v1.length) l.push('  (aucune)');
+    l.push('');
+    l.push('Plus tard (' + etat.v2.length + ') :');
+    etat.v2.forEach(function(x){ l.push('  - ' + x) });
+    if(!etat.v2.length) l.push('  (aucune)');
+    l.push('');
+    l.push('À compléter : devise, ville, téléphone/WhatsApp du reçu,');
+    l.push('message de remerciement, politique d\'échange, imprimante disponible.');
+    return l.join('\n');
+  }
+
+  var sortie = document.getElementById('sortie');
+  document.getElementById('btn-voir').addEventListener('click', function(){
+    sortie.classList.toggle('vu');
+    this.textContent = sortie.classList.contains('vu') ? 'Masquer le texte' : 'Afficher le texte';
+    if(sortie.classList.contains('vu')) sortie.scrollIntoView({block:'nearest', behavior:'smooth'});
+  });
+  document.getElementById('btn-copier').addEventListener('click', function(){
+    var btn = this;
+    sortie.classList.add('vu');
+    sortie.select();
+    var fini = function(ok){
+      btn.textContent = ok ? 'Copié ✓' : 'Sélectionne le texte ci-dessous';
+      setTimeout(function(){ btn.textContent = 'Copier le résumé' }, 2600);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(sortie.value).then(function(){fini(true)}, function(){fini(false)});
+    } else { fini(false); }
+  });
+
+  rendre();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Logo La Tresse">
+  <title>La Tresse</title>
+  <path d="M34 12 C34 28 62 32 62 48 C62 64 34 68 34 82" fill="none" stroke="#6E1F46" stroke-width="9" stroke-linecap="round"/>
+  <path d="M62 12 C62 28 34 32 34 48 C34 64 62 68 62 82" fill="none" stroke="#A9732E" stroke-width="9" stroke-linecap="round"/>
+  <rect x="36" y="80" width="24" height="9" rx="4.5" fill="#A9732E"/>
+</svg>
