@@ -7,8 +7,11 @@ import '../coeur/constantes.dart';
 
 class Parametres {
   const Parametres({
-    this.nomBoutique = 'Belle Couronne',
-    this.slogan = 'La couronne qui vous ressemble',
+    // Volontairement vides : c'est à la vendeuse d'inscrire sa marque. Tant
+    // que le nom manque, l'application sait qu'elle n'a jamais été configurée
+    // et propose l'accueil de première ouverture.
+    this.nomBoutique = '',
+    this.slogan = '',
     this.logo = 'couronne',
     this.palette = 'prune',
     this.telephone = '',
@@ -58,6 +61,11 @@ class Parametres {
   final String derniereSortieLe;
 
   int get decimales => devises[devise] ?? 2;
+
+  /// `false` tant que la boutique n'a pas été nommée. C'est ce qui distingue
+  /// une toute première ouverture d'une boutique déjà en service — le nom
+  /// s'imprime sur chaque reçu, il ne peut pas rester à deviner.
+  bool get estConfiguree => nomBoutique.trim().isNotEmpty;
 
   /// Montant prêt à afficher : « 38 000 FCFA » ou « 38,00 € ».
   String format(int centimes) {

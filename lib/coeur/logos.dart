@@ -75,9 +75,12 @@ String logoSvg(String cle, {required String primaire, required String accent}) {
 }
 
 /// Initiales de la boutique, pour le monogramme (« Belle Couronne » → « BC »).
+///
+/// Sur une boutique pas encore nommée — l'écran de première ouverture, avant
+/// la première frappe — on ne renvoie rien : afficher les initiales d'une
+/// enseigne inventée donnerait à croire qu'elle est déjà la sienne.
 String initialesDe(String nom) {
   final mots = nom.trim().split(RegExp(r'\s+')).where((m) => m.isNotEmpty).toList();
-  if (mots.isEmpty) return 'BC';
-  final lettres = mots.take(2).map((m) => m[0].toUpperCase()).join();
-  return lettres.isEmpty ? 'BC' : lettres;
+  if (mots.isEmpty) return '';
+  return mots.take(2).map((m) => m[0].toUpperCase()).join();
 }

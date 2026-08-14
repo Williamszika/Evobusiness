@@ -15,7 +15,7 @@ web**.
 ```bash
 flutter pub get               # installer les dépendances
 flutter run                   # lancer sur un téléphone branché ou un émulateur
-flutter test                  # les 98 tests
+flutter test                  # les 109 tests
 flutter analyze               # l'analyse statique
 flutter build apk --release --split-per-abi   # produire les APK à installer
 ```
@@ -43,10 +43,16 @@ dossier `/ (root)`** — voir
 
 Aucune génération de code n'est nécessaire : `flutter pub get` suffit.
 
-Au tout premier lancement, l'application installe un **catalogue de
-démonstration** (mèches, perruques, closures, clientes, ventes, dépenses) pour
-qu'elle soit immédiatement explorable. Il s'efface d'un bouton dans
-Réglages → Données → « Repartir de zéro ».
+Au tout premier lancement, l'application **s'ouvre vide**. Elle demande le nom
+du business, le téléphone et la ville — ce qui s'imprime sur les reçus, et que
+rien ne permet de deviner — puis laisse la place libre : c'est la vendeuse qui
+saisit son stock.
+
+Le **catalogue de démonstration** (mèches, perruques, closures, clientes,
+ventes, dépenses) reste disponible d'un bouton, « Voir d'abord un exemple
+rempli », et s'efface par Réglages → Données → « Repartir de zéro ». C'est un
+choix offert, plus un contenu imposé dont il fallait deviner comment se
+débarrasser.
 
 ---
 
@@ -116,9 +122,10 @@ Un téléphone perdu ne doit pas être un business perdu.
 
 ## Les décisions de marque
 
-Les choix de nom, de logo et de palette n'ont pas encore été tranchés :
-l'application démarre sur « Belle Couronne » + palette Prune & Laiton + logo
-Couronne, et **tout se change dans Réglages** en quelques secondes.
+Le nom n'est plus décidé ici : **c'est la vendeuse qui l'inscrit** à la
+première ouverture, avec son logo. La palette Prune & Laiton sert de départ, et
+**tout se change dans Réglages** en quelques secondes. Les propositions
+ci-dessous restent une réserve d'idées pour qui hésite.
 
 | Document | Contenu |
 | --- | --- |
@@ -159,7 +166,7 @@ Six règles tenues dans tout le code :
 6. **Aucune dépendance à un serveur extérieur** : moteur graphique, pdf.js et
    SQLite sont livrés avec l'application. Elle ne contacte personne.
 
-`flutter analyze` : aucun problème. `flutter test` : 98 tests, dont le parcours
+`flutter analyze` : aucun problème. `flutter test` : 109 tests, dont le parcours
 complet de vente, la fabrication réelle du reçu PDF dans les deux formats, et
 celle du document comptable sur plusieurs pages.
 

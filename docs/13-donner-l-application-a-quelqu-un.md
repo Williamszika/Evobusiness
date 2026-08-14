@@ -6,6 +6,19 @@ personne qui vend. Ce document règle la seule question qui compte alors —
 
 ---
 
+## La boutique s'ouvre vide
+
+Elle ne contient **aucun article, aucune cliente, aucune vente**. La première
+ouverture pose trois questions — le nom du business, le téléphone, la ville —
+puis laisse la place libre. Rien à effacer avant de commencer : le nom qui
+s'imprime sur les reçus est le sien dès le premier reçu.
+
+Le jeu de démonstration n'a pas disparu, il a changé de statut : il est devenu
+un choix (« Voir d'abord un exemple rempli »), au lieu d'un contenu imposé dont
+il fallait deviner comment se débarrasser.
+
+---
+
 ## La réponse courte : la version web. Ce n'est plus un compromis.
 
 Tant qu'il s'agissait de ton propre iPhone, la vraie application native était
@@ -86,12 +99,16 @@ adresse-là qu'il faut donner à ton amie**, pas l'autre.
 >
 > Elle marche **sans connexion internet**. Tu peux vendre en pleine coupure.
 >
-> **4.** À la première ouverture, il y a des articles d'exemple pour que tu
-> voies à quoi ça ressemble. Quand tu es prête à saisir ton vrai stock :
-> **Paramètres → Repartir de zéro**.
+> **4.** À la première ouverture, elle te demande le **nom de ton business**,
+> ton téléphone et ta ville. C'est ce qui s'imprimera sur tes reçus. Choisis
+> aussi ton logo au passage — tout est modifiable plus tard.
 >
-> **5.** Toujours dans **Paramètres**, mets ton nom de business, ton téléphone,
-> ton WhatsApp et ta ville : ils s'impriment sur chaque reçu.
+> **5.** Ta boutique est **vide** : c'est toi qui saisis tes articles, tes prix
+> et tes quantités. Onglet **Stock**, bouton **+**.
+>
+> *(Si tu veux d'abord voir à quoi ça ressemble une fois rempli, il y a
+> « Voir d'abord un exemple rempli » en bas du premier écran. Tu effaces tout
+> ensuite avec Paramètres → Repartir de zéro.)*
 >
 > ⚠️ **Le plus important :** tous les 2-3 jours, va dans
 > **Paramètres → Sauvegarde → « Mettre à l'abri »** et envoie-toi le fichier

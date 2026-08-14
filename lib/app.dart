@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'coeur/theme.dart';
+import 'ecrans/bienvenue/bienvenue.dart';
 import 'ecrans/coque.dart';
 import 'etat/boutique.dart';
 
@@ -15,7 +16,9 @@ class Application extends ConsumerWidget {
     final palette = paletteParCle(etat.parametres.palette);
 
     return MaterialApp(
-      title: etat.parametres.nomBoutique,
+      title: etat.parametres.estConfiguree
+          ? etat.parametres.nomBoutique
+          : 'Ma Boutique',
       debugShowCheckedModeBanner: false,
       theme: construireTheme(palette),
       locale: const Locale('fr', 'FR'),
@@ -25,7 +28,13 @@ class Application extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: etat.pret ? const Coque() : _Demarrage(palette: palette),
+      // Trois états, dans cet ordre : la base s'ouvre, la boutique n'a jamais
+      // été nommée, la boutique est en service.
+      home: !etat.pret
+          ? _Demarrage(palette: palette)
+          : etat.parametres.estConfiguree
+              ? const Coque()
+              : const EcranBienvenue(),
     );
   }
 }

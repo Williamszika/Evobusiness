@@ -231,7 +231,23 @@ Future<void> installerDemo(Depot depot) async {
   }
 
   // Les trois reçus de démonstration sont déjà émis : le compteur reprend
-  // à la suite. Les réglages de marque déjà saisis sont conservés.
+  // à la suite.
   final parametres = await depot.lireParametres();
-  await depot.ecrireParametres(parametres.copie(compteurRecu: 4));
+  await depot.ecrireParametres(
+    parametres.estConfiguree
+        // Une vraie boutique recharge la démonstration pour s'en servir de
+        // bac à sable : sa marque à elle ne doit surtout pas être écrasée.
+        ? parametres.copie(compteurRecu: 4)
+        // Boutique jamais nommée : la démonstration se présente sous sa
+        // propre enseigne. Sans cela elle resterait « non configurée », et
+        // l'application rouvrirait l'écran de bienvenue indéfiniment.
+        : parametres.copie(
+            compteurRecu: 4,
+            nomBoutique: 'Belle Couronne',
+            slogan: 'La couronne qui vous ressemble',
+            telephone: '+237 6 99 00 00 00',
+            whatsapp: '+237 6 99 00 00 00',
+            ville: 'Douala',
+          ),
+  );
 }

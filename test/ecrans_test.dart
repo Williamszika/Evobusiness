@@ -21,9 +21,12 @@ void main() {
   setUp(() async {
     boutique = BoutiqueNotifier();
     final depot = await Depot.ouvrir(cheminForce: inMemoryDatabasePath);
-    // La démonstration s'installe toute seule sur une base vide : les écrans
-    // sont donc testés avec du contenu réaliste.
     await boutique.demarrer(depotForce: depot);
+    // La boutique démarre vide depuis qu'elle est destinée à être remplie par
+    // sa propriétaire. On installe donc la démonstration explicitement : les
+    // écrans se testent avec du contenu réaliste, et l'écran de bienvenue a
+    // ses propres tests.
+    await boutique.reinstallerDemo();
   });
 
   // Pas de `dispose()` ici : le ProviderScope du test possède le notifier

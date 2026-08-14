@@ -127,14 +127,14 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
     return d;
   }
 
-  /// Ouvre la base, installe la démonstration au premier lancement,
-  /// charge tout en mémoire, puis dépose une copie du jour.
+  /// Ouvre la base, charge tout en mémoire, puis dépose une copie du jour.
+  ///
+  /// La boutique démarre **vide** : c'est la vendeuse qui saisit son propre
+  /// stock. Le jeu de démonstration reste accessible depuis les paramètres,
+  /// pour qui veut voir à quoi ressemble une boutique en activité.
   Future<void> demarrer({Depot? depotForce, StockSauvegardes? stock}) async {
     final d = depotForce ?? await Depot.ouvrir();
     _depot = d;
-    if (await d.estVide) {
-      await installerDemo(d);
-    }
     await recharger();
 
     _stock = stock ?? creerStockSauvegardes();

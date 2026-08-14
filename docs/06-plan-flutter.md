@@ -48,7 +48,7 @@ Base SQLite locale, neuf tables :
 | `mouvements_stock` | date, article, type (entrée / vente / retour / perte / ajustement), quantité, stock après, motif, vente liée |
 | `parametres` | une seule ligne, en JSON : marque, logo, palette, coordonnées, devise, préfixe et compteur de reçus, message, politique d'échange, TVA, objectif mensuel |
 
-### Cinq règles posées dans le code
+### Six règles posées dans le code
 
 1. **L'argent en entiers.** Tout est stocké en centimes (`38 000 FCFA` → `3800000`).
    Les décimaux font perdre un franc de temps en temps — inacceptable sur une caisse.
@@ -60,7 +60,13 @@ Base SQLite locale, neuf tables :
    PDF ne couvrent que le latin : un émoji ou un tiret cadratin disparaîtrait
    silencieusement du reçu. `texteImprimable()` convertit ce qui a un
    équivalent et retire le reste — l'émoji, lui, reste dans le message WhatsApp.
-5. **Une recette est datée du jour où l'argent arrive.** L'application savait
+5. **La boutique s'ouvre vide, et se nomme elle-même.** Elle est faite pour
+   être remise à quelqu'un : aucun article n'est imposé, et le nom qui
+   s'imprime sur les reçus est demandé à la première ouverture plutôt que
+   deviné. La démonstration reste offerte d'un bouton — et **se donne alors sa
+   propre enseigne**, sans quoi la boutique resterait « non configurée » et
+   l'écran de bienvenue rouvrirait sans fin.
+6. **Une recette est datée du jour où l'argent arrive.** L'application savait
    *combien* une cliente avait payé, jamais *quand* : la table `reglements` a été
    ajoutée pour ça. Un acompte de janvier et son solde de mars tombent ainsi dans
    deux mois différents, et un mois déjà clos ne se réécrit jamais — un
@@ -83,7 +89,7 @@ lib/
   donnees/
     modeles.dart         Produit, Client, Vente, LigneVente, Dépense…
     depot.dart           SQLite : schéma, requêtes, sauvegarde JSON
-    demo.dart            catalogue de démonstration du premier lancement
+    demo.dart            catalogue de démonstration, désormais optionnel
     sauvegarde.dart      copies automatiques, rotation, restauration
   etat/
     boutique.dart        l'état de la boutique et toutes les opérations
@@ -91,6 +97,7 @@ lib/
     comptabilite.dart    bilan d'une période, tenu à l'encaissement
   ecrans/
     coque.dart           les cinq onglets et le bouton « Vendre »
+    bienvenue/           première ouverture : nom, contact, devise, logo
     accueil.dart
     produits/            liste, fiche, édition
     ventes/              choix des articles, encaissement, liste, détail
@@ -112,7 +119,7 @@ modification.
 
 ## Les tests
 
-`flutter test` — **98 tests**, tous au vert.
+`flutter test` — **109 tests**, tous au vert.
 
 | Fichier | Ce qu'il vérifie |
 | --- | --- |
@@ -122,6 +129,7 @@ modification.
 | `test/recu_test.dart` | Le PDF se fabrique vraiment en A5 et en ticket, pour les huit logos et les trois palettes, à crédit comme annulé ; assainissement du texte imprimé ; message WhatsApp |
 | `test/sauvegarde_test.dart` | Sauvegarde automatique : déclenchement, rotation sur cinq copies, restauration qui rattrape un « Repartir de zéro », fichier illisible sans dégât, rappel hebdomadaire |
 | `test/ecrans_test.dart` | L'application se lance, les cinq onglets se dessinent sur un écran de téléphone, la recherche filtre, et le **parcours complet de vente** enregistre bien la vente et décrémente le stock |
+| `test/bienvenue_test.dart` | La boutique s'ouvre **vide** ; sans nom elle n'est pas configurée et le bouton reste inerte ; saisir un nom ouvre la boutique avec le reçu n° 1 ; la démonstration se nomme elle-même mais **n'écrase jamais** la marque d'une vraie boutique |
 | `test/comptabilite_test.dart` | Le bilan d'une période : la vente comptant tombe dans son mois, **l'acompte et le solde dans deux mois différents**, l'impayé n'est pas une recette, le remboursement n'efface pas le passé ; le document PDF se fabrique sur une période vide comme sur une année à 60 encaissements ; et l'invariant « toute vente encaissée porte ses règlements » |
 
 Sept bugs réels ont été trouvés pendant le développement, par les tests puis
@@ -143,7 +151,7 @@ lancement, alors que trois reçus étaient bien émis.
 ```bash
 flutter pub get          # installer les dépendances
 flutter run              # lancer sur un téléphone branché ou un émulateur
-flutter test             # les 98 tests
+flutter test             # les 109 tests
 flutter analyze          # l'analyse statique
 flutter build apk --release   # produire l'APK à installer sur Android
 ```
