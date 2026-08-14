@@ -1,5 +1,10 @@
 # Brancher l'application à Supabase
 
+> **Décision prise : pas de serveur pour l'instant.** L'usage est un seul
+> téléphone, et la sauvegarde automatique intégrée à l'application couvre le
+> risque — voir [`09-serveur-ou-pas.md`](09-serveur-ou-pas.md). Ce document
+> reste valable pour le jour où une deuxième personne vendra.
+
 **Réponse courte : oui, et c'est une bonne idée.** Mais pas comme « le
 serveur » de l'application — comme sa **sauvegarde vivante**.
 

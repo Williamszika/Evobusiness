@@ -7,6 +7,7 @@ import '../coeur/theme.dart';
 import '../etat/boutique.dart';
 import '../etat/indicateurs.dart';
 import 'depenses/depenses.dart';
+import 'parametres/actions_sauvegarde.dart';
 import 'parametres/parametres.dart';
 import 'produits/fiche_produit.dart';
 import 'ventes/detail_vente.dart';
@@ -251,6 +252,65 @@ class Accueil extends ConsumerWidget {
                 ),
               ),
             ],
+            const SizedBox(height: 20),
+          ],
+
+          // ── Rappel de sauvegarde
+          //
+          // Avec un seul téléphone, c'est le seul vrai risque : tout perdre
+          // d'un coup. Le rappel reste discret mais ne disparaît pas tant
+          // qu'une copie n'a pas été mise à l'abri.
+          if (rappelSauvegardeNecessaire(p.derniereSortieLe)) ...[
+            Card(
+              color: Etats.attentionFond,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: Etats.attention, width: 1.2),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  children: [
+                    const Icon(Icons.cloud_off_outlined,
+                        color: Etats.attention, size: 22),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            p.derniereSortieLe.isEmpty
+                                ? 'Mets ta boutique à l\'abri'
+                                : 'Sauvegarde vieille de '
+                                    '${Dates.joursDepuis(p.derniereSortieLe.split("T").first)} jours',
+                            style: theme.textTheme.titleMedium
+                                ?.copyWith(color: Etats.attention),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Enregistre une copie dans ton Drive ou envoie-la-toi '
+                            'sur WhatsApp. Si le téléphone est perdu, c\'est elle '
+                            'qui sauve ton business.',
+                            style: theme.textTheme.bodySmall
+                                ?.copyWith(color: Etats.attention),
+                          ),
+                          const SizedBox(height: 10),
+                          FilledButton.icon(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Etats.attention,
+                              minimumSize: const Size(0, 42),
+                            ),
+                            onPressed: () => sortirSauvegarde(context, ref),
+                            icon: const Icon(Icons.save_alt, size: 17),
+                            label: const Text('Sauvegarder maintenant'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
           ],
 

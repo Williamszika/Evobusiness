@@ -22,7 +22,7 @@ paquets utilisés sont éprouvés et gratuits.
 | Logos | `flutter_svg` | Le **même** texte SVG sert à l'écran et au PDF : un seul logo, jamais deux versions à maintenir |
 | Photos d'articles | `image_picker` + `path_provider` | Photo prise avec l'appareil, recopiée dans l'app pour survivre au ménage de la galerie |
 | Français & devises | `intl` + `flutter_localizations` | Dates et montants au format local |
-| Sauvegarde | `file_picker` | Enregistre et relit le fichier JSON de sauvegarde |
+| Sauvegarde | `file_picker` + `path_provider` | Copies automatiques dans le dossier de l'application, et fichier JSON à mettre à l'abri |
 
 **Écart avec le plan** : `share_plus` et `esc_pos_utils_plus` ne sont pas
 installés. Le partage passe par `printing`, qui fait le même travail sans
@@ -78,6 +78,7 @@ lib/
     modeles.dart         Produit, Client, Vente, LigneVente, Dépense…
     depot.dart           SQLite : schéma, requêtes, sauvegarde JSON
     demo.dart            catalogue de démonstration du premier lancement
+    sauvegarde.dart      copies automatiques, rotation, restauration
   etat/
     boutique.dart        l'état de la boutique et toutes les opérations
     indicateurs.dart     chiffre d'affaires, marges, classements, séries
@@ -103,7 +104,7 @@ modification.
 
 ## Les tests
 
-`flutter test` — **60 tests**, tous au vert.
+`flutter test` — **76 tests**, tous au vert.
 
 | Fichier | Ce qu'il vérifie |
 | --- | --- |
@@ -111,12 +112,14 @@ modification.
 | `test/vente_test.dart` | Totaux, remises, marge (la livraison n'est pas un bénéfice), statuts de paiement, reste à payer, marge d'un article |
 | `test/boutique_test.dart` | Sur une vraie base SQLite : sortie de stock à la vente, numérotation continue, acompte puis solde, services sans stock, annulation qui rend le stock, bénéfice net, classement au bénéfice, aller-retour sauvegarde |
 | `test/recu_test.dart` | Le PDF se fabrique vraiment en A5 et en ticket, pour les huit logos et les trois palettes, à crédit comme annulé ; assainissement du texte imprimé ; message WhatsApp |
+| `test/sauvegarde_test.dart` | Sauvegarde automatique : déclenchement, rotation sur cinq copies, restauration qui rattrape un « Repartir de zéro », fichier illisible sans dégât, rappel hebdomadaire |
 | `test/ecrans_test.dart` | L'application se lance, les cinq onglets se dessinent sur un écran de téléphone, la recherche filtre, et le **parcours complet de vente** enregistre bien la vente et décrémente le stock |
 
-Deux bugs réels ont été trouvés par ces tests pendant le développement :
+Quatre bugs réels ont été trouvés par ces tests pendant le développement :
 l'espace fine insécable des milliers qui disparaissait du reçu imprimé
-(« 38 000 » devenait « 38000 »), et deux débordements de mise en page sur écran
-étroit.
+(« 38 000 » devenait « 38000 »), deux débordements de mise en page sur écran
+étroit, et deux sauvegardes lancées dans la même seconde qui s'écrasaient
+l'une l'autre.
 
 ---
 
@@ -125,7 +128,7 @@ l'espace fine insécable des milliers qui disparaissait du reçu imprimé
 ```bash
 flutter pub get          # installer les dépendances
 flutter run              # lancer sur un téléphone branché ou un émulateur
-flutter test             # les 60 tests
+flutter test             # les 76 tests
 flutter analyze          # l'analyse statique
 flutter build apk --release   # produire l'APK à installer sur Android
 ```

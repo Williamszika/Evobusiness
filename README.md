@@ -13,7 +13,7 @@ Développée en **Flutter** (Android + iOS), un seul code source.
 ```bash
 flutter pub get               # installer les dépendances
 flutter run                   # lancer sur un téléphone branché ou un émulateur
-flutter test                  # les 60 tests
+flutter test                  # les 76 tests
 flutter analyze               # l'analyse statique
 flutter build apk --release --split-per-abi   # produire les APK à installer
 ```
@@ -71,8 +71,11 @@ coordonnées, devise, message de remerciement et politique d'échange sont tous
 modifiables.
 
 **La sauvegarde**
-Export et restauration par fichier JSON. Un téléphone perdu ne doit pas être un
-business perdu.
+L'application se sauvegarde **toute seule à chaque ouverture** et garde les
+cinq dernières copies : une fausse manœuvre se rattrape en deux touches. Et
+tant qu'aucune copie n'a été mise à l'abri hors du téléphone, l'accueil le
+rappelle — un bouton, et le fichier part vers Drive, iCloud ou WhatsApp.
+Un téléphone perdu ne doit pas être un business perdu.
 
 ---
 
@@ -93,6 +96,7 @@ Couronne, et **tout se change dans Réglages** en quelques secondes.
 | [`docs/06-plan-flutter.md`](docs/06-plan-flutter.md) | Paquets, modèle de données, règles de code, tests |
 | [`docs/07-installer-sur-iphone.md`](docs/07-installer-sur-iphone.md) | Les trois chemins pour installer sur iPhone, et leur coût |
 | [`docs/08-supabase.md`](docs/08-supabase.md) | Synchronisation cloud : architecture, sécurité, ce qui reste à écrire |
+| [`docs/09-serveur-ou-pas.md`](docs/09-serveur-ou-pas.md) | Pourquoi un seul téléphone n'a pas besoin de serveur, et quoi choisir le jour venu |
 | [`docs/logos/`](docs/logos/) | Les 8 logos en SVG |
 
 ---
@@ -112,7 +116,7 @@ Quatre règles tenues dans tout le code :
 4. **Rien ne part à l'imprimante sans être assaini** : les polices du PDF ne
    couvrent que le latin, un émoji laissé tel quel disparaîtrait du reçu.
 
-`flutter analyze` : aucun problème. `flutter test` : 60 tests, dont le parcours
+`flutter analyze` : aucun problème. `flutter test` : 76 tests, dont le parcours
 complet de vente et la fabrication réelle du PDF dans les deux formats.
 
 Détails dans [`docs/06-plan-flutter.md`](docs/06-plan-flutter.md).
@@ -124,7 +128,9 @@ Détails dans [`docs/06-plan-flutter.md`](docs/06-plan-flutter.md).
 - Impression thermique **Bluetooth** (le format ticket est déjà généré, il
   manque le pilote)
 - Relances d'impayés automatiques, commandes et arrivages, programme de
-  fidélité, sauvegarde en ligne, plusieurs vendeuses
+  fidélité, plusieurs vendeuses
+- Un serveur : inutile tant qu'un seul téléphone vend — voir
+  [`docs/09-serveur-ou-pas.md`](docs/09-serveur-ou-pas.md)
 - Polices de marque embarquées pour les titres et le reçu
 
 Voir [`docs/05-fonctionnalites.md`](docs/05-fonctionnalites.md).

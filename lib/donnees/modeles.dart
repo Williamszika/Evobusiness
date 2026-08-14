@@ -29,6 +29,7 @@ class Parametres {
     this.venduPar = '',
     this.ticketParDefaut = false,
     this.objectifMensuel = 50000000,
+    this.derniereSortieLe = '',
   });
 
   final String nomBoutique;
@@ -51,6 +52,10 @@ class Parametres {
   final String venduPar;
   final bool ticketParDefaut;
   final int objectifMensuel;
+
+  /// Date ISO de la dernière sauvegarde sortie de l'application (Drive,
+  /// iCloud, WhatsApp). Vide tant qu'aucune n'a été faite.
+  final String derniereSortieLe;
 
   int get decimales => devises[devise] ?? 2;
 
@@ -97,6 +102,7 @@ class Parametres {
     String? venduPar,
     bool? ticketParDefaut,
     int? objectifMensuel,
+    String? derniereSortieLe,
   }) =>
       Parametres(
         nomBoutique: nomBoutique ?? this.nomBoutique,
@@ -119,6 +125,7 @@ class Parametres {
         venduPar: venduPar ?? this.venduPar,
         ticketParDefaut: ticketParDefaut ?? this.ticketParDefaut,
         objectifMensuel: objectifMensuel ?? this.objectifMensuel,
+        derniereSortieLe: derniereSortieLe ?? this.derniereSortieLe,
       );
 
   Map<String, dynamic> versJson() => {
@@ -142,6 +149,7 @@ class Parametres {
         'venduPar': venduPar,
         'ticketParDefaut': ticketParDefaut,
         'objectifMensuel': objectifMensuel,
+        'derniereSortieLe': derniereSortieLe,
       };
 
   factory Parametres.depuisJson(Map<String, dynamic> j) {
@@ -168,6 +176,7 @@ class Parametres {
       ticketParDefaut: j['ticketParDefaut'] as bool? ?? false,
       objectifMensuel:
           (j['objectifMensuel'] as num?)?.toInt() ?? defaut.objectifMensuel,
+      derniereSortieLe: j['derniereSortieLe'] as String? ?? '',
     );
   }
 }

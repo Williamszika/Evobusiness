@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,9 @@ import '../../coeur/constantes.dart';
 import '../../coeur/logos.dart';
 import '../../coeur/theme.dart';
 import '../../donnees/modeles.dart';
+import '../../donnees/sauvegarde.dart';
 import '../../etat/boutique.dart';
+import 'actions_sauvegarde.dart';
 
 class EcranParametres extends ConsumerStatefulWidget {
   const EcranParametres({super.key});
@@ -422,34 +424,98 @@ class _EcranParametresState extends ConsumerState<EcranParametres> {
             enfant: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: [
+                    Icon(
+                      rappelSauvegardeNecessaire(_p.derniereSortieLe)
+                          ? Icons.warning_amber_rounded
+                          : Icons.verified_outlined,
+                      size: 20,
+                      color: rappelSauvegardeNecessaire(_p.derniereSortieLe)
+                          ? Etats.attention
+                          : Etats.ok,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _p.derniereSortieLe.isEmpty
+                            ? 'Aucune copie mise à l\'abri pour l\'instant'
+                            : 'Dernière copie mise à l\'abri il y a '
+                                '${Dates.joursDepuis(_p.derniereSortieLe.split("T").first)} jour(s)',
+                        style: theme.textTheme.titleMedium,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  'Un téléphone perdu ne doit pas être un business perdu. '
-                  'Enregistre une sauvegarde chaque semaine et envoie-la-toi '
-                  'sur WhatsApp ou sur Drive.',
+                  'L\'application se sauvegarde toute seule à chaque ouverture, '
+                  'et garde les ${Sauvegarde.nombreConserve} dernières copies. '
+                  'Mais ce dossier disparaît si l\'application est désinstallée : '
+                  'une fois par semaine, enregistre une copie dans ton Drive, '
+                  'ton iCloud, ou envoie-la-toi sur WhatsApp.',
                   style: theme.textTheme.bodySmall,
                 ),
                 const SizedBox(height: 14),
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: FilledButton.icon(
                         onPressed: _sauvegardeEnCours ? null : _exporter,
                         icon: const Icon(Icons.save_alt, size: 18),
-                        label: const Text('Sauvegarder'),
+                        label: const Text('Mettre à l\'abri'),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: _sauvegardeEnCours ? null : _importer,
-                        icon: const Icon(Icons.restore, size: 18),
-                        label: const Text('Restaurer'),
+                        icon: const Icon(Icons.folder_open_outlined, size: 18),
+                        label: const Text('Depuis un fichier'),
                       ),
                     ),
                   ],
                 ),
               ],
             ),
+          ),
+          const SizedBox(height: 12),
+
+          // Les copies déposées automatiquement par l'application.
+          FutureBuilder<List<File>>(
+            future: ref.read(boutiqueProvider.notifier).listerSauvegardes(),
+            builder: (context, instantane) {
+              final fichiers = instantane.data ?? const <File>[];
+              if (fichiers.isEmpty) return const SizedBox.shrink();
+              return Card(
+                child: Column(
+                  children: [
+                    for (final fichier in fichiers)
+                      ListTile(
+                        dense: true,
+                        leading: const Icon(Icons.history, size: 20),
+                        title: Builder(
+                          builder: (_) {
+                            final quand = Sauvegarde.dateDe(fichier);
+                            return Text(
+                              quand == null
+                                  ? 'Sauvegarde'
+                                  : '${Dates.court(Dates.jourIso(quand))} à '
+                                      '${quand.hour.toString().padLeft(2, '0')}h'
+                                      '${quand.minute.toString().padLeft(2, '0')}',
+                            );
+                          },
+                        ),
+                        subtitle: Text(Sauvegarde.tailleDe(fichier)),
+                        trailing: TextButton(
+                          onPressed: () => _restaurerLocale(fichier),
+                          child: const Text('Restaurer'),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
           ),
           const SizedBox(height: 20),
 
@@ -552,28 +618,39 @@ class _EcranParametresState extends ConsumerState<EcranParametres> {
 
   Future<void> _exporter() async {
     setState(() => _sauvegardeEnCours = true);
-    try {
-      final donnees = await ref.read(boutiqueProvider.notifier).exporter();
-      final texte = const JsonEncoder.withIndent('  ').convert(donnees);
-      final octets = Uint8List.fromList(utf8.encode(texte));
-      final nom = 'sauvegarde-'
-          '${_p.nomBoutique.toLowerCase().replaceAll(RegExp(r"[^a-z0-9]+"), "-")}-'
-          '${Dates.aujourdhui()}.json';
+    await sortirSauvegarde(context, ref);
+    if (mounted) {
+      setState(() {
+        _p = ref.read(boutiqueProvider).parametres;
+        _sauvegardeEnCours = false;
+      });
+    }
+  }
 
-      final chemin = await FilePicker.platform.saveFile(
-        dialogTitle: 'Enregistrer la sauvegarde',
-        fileName: nom,
-        bytes: octets,
-      );
+  /// Restaure la boutique depuis l'une des copies déposées automatiquement
+  /// par l'application.
+  Future<void> _restaurerLocale(File fichier) async {
+    final quand = Sauvegarde.dateDe(fichier);
+    final ok = await confirmer(
+      context,
+      titre: 'Revenir à cette sauvegarde ?',
+      texte: quand == null
+          ? 'Le contenu actuel sera remplacé.'
+          : 'Le contenu actuel sera remplacé par celui du '
+              '${Dates.court(Dates.jourIso(quand))} à '
+              '${quand.hour.toString().padLeft(2, '0')}h'
+              '${quand.minute.toString().padLeft(2, '0')}.',
+      valider: 'Restaurer',
+      dangereux: true,
+    );
+    if (!ok) return;
+    try {
+      await ref.read(boutiqueProvider.notifier).restaurerFichier(fichier);
       if (!mounted) return;
-      message(
-        context,
-        chemin == null ? 'Sauvegarde annulée.' : 'Sauvegarde enregistrée.',
-      );
+      setState(() => _p = ref.read(boutiqueProvider).parametres);
+      message(context, 'Boutique restaurée.');
     } catch (e) {
-      if (mounted) message(context, 'Sauvegarde impossible : $e', erreur: true);
-    } finally {
-      if (mounted) setState(() => _sauvegardeEnCours = false);
+      if (mounted) message(context, 'Restauration impossible : $e', erreur: true);
     }
   }
 

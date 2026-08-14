@@ -59,6 +59,19 @@ void main() {
     expect(find.text('À SURVEILLER'), findsOneWidget);
   });
 
+  testWidgets('l\'accueil rappelle de mettre la boutique à l\'abri',
+      (tester) async {
+    await lancer(tester);
+    // Aucune copie n'a encore été sortie : le rappel doit être là.
+    await tester.scrollUntilVisible(
+      find.text('Mets ta boutique à l\'abri'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Sauvegarder maintenant'), findsOneWidget);
+  });
+
   testWidgets('les cinq onglets se dessinent sans erreur', (tester) async {
     await lancer(tester);
     for (final onglet in ['Stock', 'Ventes', 'Clientes', 'Rapports', 'Accueil']) {

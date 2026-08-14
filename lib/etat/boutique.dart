@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../coeur/argent.dart';
 import '../coeur/constantes.dart';
 import '../donnees/demo.dart';
 import '../donnees/depot.dart';
 import '../donnees/modeles.dart';
+import '../donnees/sauvegarde.dart';
 
 /// Photographie complète de la boutique, gardée en mémoire.
 ///
@@ -106,6 +110,11 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
   BoutiqueNotifier() : super(const EtatBoutique());
 
   Depot? _depot;
+  Directory? _dossierSauvegardes;
+
+  /// Dossier des sauvegardes automatiques. `null` si le système ne l'a pas
+  /// fourni — la sauvegarde est alors désactivée, sans jamais bloquer l'app.
+  Directory? get dossierSauvegardes => _dossierSauvegardes;
 
   Depot get depot {
     final d = _depot;
@@ -114,15 +123,67 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
   }
 
   /// Ouvre la base, installe la démonstration au premier lancement,
-  /// puis charge tout en mémoire.
-  Future<void> demarrer({Depot? depotForce}) async {
+  /// charge tout en mémoire, puis dépose une sauvegarde du jour.
+  Future<void> demarrer({Depot? depotForce, Directory? dossierSauvegardes}) async {
     final d = depotForce ?? await Depot.ouvrir();
     _depot = d;
     if (await d.estVide) {
       await installerDemo(d);
     }
     await recharger();
+
+    _dossierSauvegardes = dossierSauvegardes ?? await _dossierParDefaut();
+    await sauvegardeAutomatique();
   }
+
+  /// Le dossier de l'application, s'il est accessible. Une erreur ici ne doit
+  /// jamais empêcher la boutique de s'ouvrir : on renonce simplement à la
+  /// sauvegarde automatique.
+  Future<Directory?> _dossierParDefaut() async {
+    try {
+      final racine = await getApplicationDocumentsDirectory();
+      return Sauvegarde.dossierDans(racine);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Dépose une copie complète si la dernière commence à dater.
+  Future<File?> sauvegardeAutomatique() async {
+    final dossier = _dossierSauvegardes;
+    if (dossier == null) return null;
+    try {
+      if (!await Sauvegarde.faudraitSauvegarder(dossier)) return null;
+      return await Sauvegarde.ecrire(dossier, await depot.exporterJson());
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Force une sauvegarde immédiate, quelle que soit la date de la précédente.
+  Future<File?> sauvegarderMaintenant() async {
+    final dossier = _dossierSauvegardes;
+    if (dossier == null) return null;
+    return Sauvegarde.ecrire(dossier, await depot.exporterJson());
+  }
+
+  Future<List<File>> listerSauvegardes() async {
+    final dossier = _dossierSauvegardes;
+    if (dossier == null) return const [];
+    return Sauvegarde.lister(dossier);
+  }
+
+  /// Restaure la boutique depuis un fichier de sauvegarde local.
+  Future<void> restaurerFichier(File fichier) async {
+    await importer(await Sauvegarde.lire(fichier));
+  }
+
+  /// Note qu'une copie vient d'être sortie de l'application (Drive, iCloud,
+  /// WhatsApp) : c'est cette date que le rappel de l'accueil surveille.
+  Future<void> marquerSortie() =>
+      majParametres(state.parametres.copie(
+        derniereSortieLe: DateTime.now().toIso8601String(),
+      ));
 
   Future<void> recharger() async {
     final d = depot;
