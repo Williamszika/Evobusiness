@@ -41,6 +41,38 @@ Une à deux minutes plus tard, l'application répond à l'adresse
 `https://<compte>.github.io/Evobusiness/`. Toutes les mises à jour suivantes
 seront automatiques.
 
+### Deux impasses, et la sortie
+
+Trois voies ont été essayées pour éviter tout réglage manuel. Ce qui a été
+constaté :
+
+| Voie | Résultat |
+| --- | --- |
+| Activer Pages depuis le workflow (`configure-pages`) | **Échec.** Créer un site Pages demande des droits d'administration que le jeton des workflows n'a pas : `Resource not accessible by integration` |
+| Créer le dépôt `<compte>.github.io` par l'API | **Échec.** Même mur de permissions |
+| Servir la branche par jsDelivr | **Écarté.** jsDelivr renvoie `index.html` en `text/plain` : le navigateur afficherait le code source |
+
+**La sortie :** un dépôt nommé exactement `<compte>.github.io` est publié
+**automatiquement dès le premier envoi**, sans passer par les réglages
+([documentation GitHub](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)).
+Créer un dépôt est possible depuis l'application GitHub sur téléphone, alors
+que les réglages Pages n'y sont pas accessibles — c'est donc le chemin le plus
+sûr quand on n'a pas d'ordinateur sous la main.
+
+### En attendant : un lien de dépannage
+
+La branche `web-cdn` contient une version compilée pour être servie par
+`rawcdn.githack.com`, un relais public qui sert les fichiers d'un dépôt GitHub
+avec les bons types MIME — y compris `application/wasm`, indispensable ici.
+
+    https://rawcdn.githack.com/Williamszika/Evobusiness/web-cdn/
+
+C'est un dépannage, pas un hébergement : ce relais est un service bénévole,
+avec des limites de débit et aucune garantie de durée. Il permet d'essayer
+l'application tout de suite ; il ne doit pas rester l'adresse d'un outil de
+travail quotidien. La branche `web-cdn` peut être supprimée une fois le vrai
+hébergement en place.
+
 ### Pourquoi une branche plutôt que le mode « GitHub Actions »
 
 Le mode moderne de Pages a été essayé en premier. Il échoue avant même la
