@@ -1,0 +1,81 @@
+# Compile la vraie application iPhone (.ipa), sur un Mac.
+#
+# Pourquoi un workflow plutôt qu'une commande locale : compiler pour iOS exige
+# macOS et Xcode. Aucune machine Linux ou Windows n'en est capable, quelle que
+# soit la version de Flutter. GitHub prête des Mac aux dépôts publics, et c'est
+# la seule façon d'obtenir un .ipa sans posséder de Mac.
+#
+# Le paquet produit est **non signé**. C'est volontaire : signer exige un
+# identifiant Apple et un certificat, qui n'ont pas leur place dans un dépôt
+# public. La signature se fait au moment de l'installation, sur le téléphone
+# ou depuis un ordinateur — voir docs/11-application-iphone.md.
+#
+# Un Mac met une quinzaine de minutes là où Linux en met deux. On ne le
+# réveille donc que lorsque le code de l'application change vraiment — pas
+# pour une correction de documentation — ou à la demande.
+name: Construire l'application iPhone
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, claude/hair-sales-management-app-wfpe8z]
+    paths:
+      - 'lib/**'
+      - 'ios/**'
+      - 'pubspec.yaml'
+      - '.github/workflows/construire-ios.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: construction-ios
+  cancel-in-progress: true
+
+jobs:
+  construire:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Même version que la publication web : les deux doivent produire
+      # exactement la même application.
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.0
+          channel: stable
+          cache: true
+
+      - name: Dépendances
+        run: flutter pub get
+
+      # Les mêmes garde-fous que pour le web. Une application qu'on va
+      # installer à la main mérite d'être vérifiée avant, pas après.
+      - name: Analyse
+        run: flutter analyze
+
+      - name: Tests
+        run: flutter test
+
+      - name: Compiler pour iPhone
+        run: flutter build ios --release --no-codesign
+
+      # Un .ipa n'est rien d'autre qu'un zip contenant un dossier `Payload`.
+      # On le fabrique à la main : `flutter build ipa` refuserait sans
+      # certificat de signature.
+      - name: Empaqueter en .ipa
+        run: |
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -R Runner.app Payload/
+          zip -qr MaBoutique-non-signee.ipa Payload
+          echo "Taille : $(du -h MaBoutique-non-signee.ipa | cut -f1)"
+
+      # 90 jours de conservation : le temps de trouver comment l'installer
+      # sans se sentir pressé.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MaBoutique-iphone-non-signee
+          path: build/ios/iphoneos/MaBoutique-non-signee.ipa
+          retention-days: 90
+          if-no-files-found: error
