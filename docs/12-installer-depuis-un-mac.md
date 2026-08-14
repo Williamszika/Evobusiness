@@ -67,16 +67,16 @@ outil tiers, et l'application se réinstalle d'un clic.
 
 ## Où trouver le fichier de l'application
 
-Onglet **Actions** du dépôt →
-[**Construire l'application iPhone**](https://github.com/Williamszika/Evobusiness/actions/runs/31839842266)
-→ en bas de page, section **Artifacts** → **`MaBoutique-iphone-non-signee`**.
+Une seule adresse, qui pointe toujours sur la dernière version :
 
-Il faut être **connecté à GitHub** : les artifacts ne se téléchargent pas
-anonymement, même sur un dépôt public. Tu obtiens un `.zip` — double-clic
-pour en sortir le `.ipa`.
+    https://github.com/Williamszika/Evobusiness/releases/latest
 
-Une nouvelle version se fabrique en cinq minutes : bouton **Run workflow** sur
-cette même page.
+Le fichier **`MaBoutique-non-signee.ipa`** (10,4 Mo) se télécharge d'un clic,
+**sans compte GitHub** et sans rien à décompresser.
+
+Une nouvelle version se fabrique en cinq minutes : onglet **Actions** →
+**Construire l'application iPhone** → **Run workflow**. Elle apparaît à la
+même adresse.
 
 ---
 

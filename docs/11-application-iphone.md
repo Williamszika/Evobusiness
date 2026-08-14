@@ -151,10 +151,19 @@ pas une décision technique.
 
 ## Comment récupérer le `.ipa`
 
-1. Onglet **Actions** du dépôt → **« Construire l'application iPhone »** ;
-2. **Run workflow** (ou attendre : il se lance à chaque modification du code) ;
-3. cinq minutes plus tard, l'archive **`MaBoutique-iphone-non-signee`** se
-   télécharge en bas de la page. Elle reste disponible **90 jours**.
+Une seule adresse, définitive, qui pointe toujours sur la dernière version :
+
+    https://github.com/Williamszika/Evobusiness/releases/latest
+
+Le fichier `MaBoutique-non-signee.ipa` s'y télécharge **sans compte GitHub**,
+sans expiration et sans archive à décompresser.
+
+Pour en fabriquer une nouvelle : onglet **Actions** → **« Construire
+l'application iPhone »** → **Run workflow**. Cinq minutes.
+
+*(Le même paquet reste aussi déposé en « artifact » sur la page de la
+construction, mais celui-là exige d'être connecté et disparaît au bout de
+90 jours — la release est préférable en tout point.)*
 
 Ce fichier est ensuite signé, soit avec le compte développeur, soit avec
 Sideloadly. Il ne s'installe pas tel quel : un iPhone refuse tout paquet non
