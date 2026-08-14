@@ -6,6 +6,7 @@ import '../coeur/composants.dart';
 import '../coeur/theme.dart';
 import '../etat/boutique.dart';
 import '../etat/indicateurs.dart';
+import 'comptabilite/comptabilite.dart';
 import 'depenses/depenses.dart';
 import 'parametres/actions_sauvegarde.dart';
 import 'parametres/parametres.dart';
@@ -376,13 +377,22 @@ class Accueil extends ConsumerWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const EcranParametres()),
+                    MaterialPageRoute(builder: (_) => const EcranComptabilite()),
                   ),
-                  icon: const Icon(Icons.tune, size: 20),
-                  label: const Text('Réglages'),
+                  icon: const Icon(Icons.account_balance_outlined, size: 20),
+                  label: const Text('Comptabilité'),
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const EcranParametres()),
+            ),
+            icon: const Icon(Icons.tune, size: 20),
+            label: const Text('Réglages'),
           ),
         ],
       ),

@@ -34,7 +34,7 @@ produit** et s'imprime sur toute imprimante compatible.
 
 ## Le modèle de données
 
-Base SQLite locale, huit tables :
+Base SQLite locale, neuf tables :
 
 | Table | Colonnes principales |
 | --- | --- |
@@ -43,11 +43,12 @@ Base SQLite locale, huit tables :
 | `fournisseurs` | nom, pays, contact, note |
 | `ventes` | numéro, date, cliente, remise globale, frais de livraison, moyen de paiement, canal, montant payé, statut, note, vendu par |
 | `lignes_vente` | vente, article, désignation figée, quantité, prix unitaire, remise, **coût d'achat figé** |
+| `reglements` | vente, **date de l'encaissement**, montant (négatif si remboursement), moyen de paiement, motif |
 | `depenses` | date, catégorie, libellé, montant, moyen de paiement, fournisseur |
 | `mouvements_stock` | date, article, type (entrée / vente / retour / perte / ajustement), quantité, stock après, motif, vente liée |
 | `parametres` | une seule ligne, en JSON : marque, logo, palette, coordonnées, devise, préfixe et compteur de reçus, message, politique d'échange, TVA, objectif mensuel |
 
-### Quatre règles posées dans le code
+### Cinq règles posées dans le code
 
 1. **L'argent en entiers.** Tout est stocké en centimes (`38 000 FCFA` → `3800000`).
    Les décimaux font perdre un franc de temps en temps — inacceptable sur une caisse.
@@ -59,6 +60,11 @@ Base SQLite locale, huit tables :
    PDF ne couvrent que le latin : un émoji ou un tiret cadratin disparaîtrait
    silencieusement du reçu. `texteImprimable()` convertit ce qui a un
    équivalent et retire le reste — l'émoji, lui, reste dans le message WhatsApp.
+5. **Une recette est datée du jour où l'argent arrive.** L'application savait
+   *combien* une cliente avait payé, jamais *quand* : la table `reglements` a été
+   ajoutée pour ça. Un acompte de janvier et son solde de mars tombent ainsi dans
+   deux mois différents, et un mois déjà clos ne se réécrit jamais — un
+   remboursement s'inscrit à **sa** date, en négatif.
 
 ---
 
@@ -82,6 +88,7 @@ lib/
   etat/
     boutique.dart        l'état de la boutique et toutes les opérations
     indicateurs.dart     chiffre d'affaires, marges, classements, séries
+    comptabilite.dart    bilan d'une période, tenu à l'encaissement
   ecrans/
     coque.dart           les cinq onglets et le bouton « Vendre »
     accueil.dart
@@ -91,6 +98,7 @@ lib/
     clients/             liste, fiche, édition, sélecteur de vente
     depenses/
     rapports/
+    comptabilite/        écran du bilan + document PDF pour les impôts
     parametres/
 ```
 
@@ -104,7 +112,7 @@ modification.
 
 ## Les tests
 
-`flutter test` — **79 tests**, tous au vert.
+`flutter test` — **98 tests**, tous au vert.
 
 | Fichier | Ce qu'il vérifie |
 | --- | --- |
@@ -114,16 +122,19 @@ modification.
 | `test/recu_test.dart` | Le PDF se fabrique vraiment en A5 et en ticket, pour les huit logos et les trois palettes, à crédit comme annulé ; assainissement du texte imprimé ; message WhatsApp |
 | `test/sauvegarde_test.dart` | Sauvegarde automatique : déclenchement, rotation sur cinq copies, restauration qui rattrape un « Repartir de zéro », fichier illisible sans dégât, rappel hebdomadaire |
 | `test/ecrans_test.dart` | L'application se lance, les cinq onglets se dessinent sur un écran de téléphone, la recherche filtre, et le **parcours complet de vente** enregistre bien la vente et décrémente le stock |
+| `test/comptabilite_test.dart` | Le bilan d'une période : la vente comptant tombe dans son mois, **l'acompte et le solde dans deux mois différents**, l'impayé n'est pas une recette, le remboursement n'efface pas le passé ; le document PDF se fabrique sur une période vide comme sur une année à 60 encaissements ; et l'invariant « toute vente encaissée porte ses règlements » |
 
-Six bugs réels ont été trouvés pendant le développement, par les tests puis
+Sept bugs réels ont été trouvés pendant le développement, par les tests puis
 par la vérification en navigateur :
 l'espace fine insécable des milliers qui disparaissait du reçu imprimé
 (« 38 000 » devenait « 38000 »), deux débordements de mise en page sur écran
 étroit, deux sauvegardes lancées dans la même seconde qui s'écrasaient l'une
 l'autre, le moteur graphique de Flutter chargé depuis un CDN (l'application
-n'aurait plus fonctionné hors connexion), et pdf.js chargé depuis un CDN dans
+n'aurait plus fonctionné hors connexion), pdf.js chargé depuis un CDN dans
 une version trop récente pour beaucoup de navigateurs, ce qui laissait
-l'aperçu du reçu gris et vide.
+l'aperçu du reçu gris et vide, et les ventes de démonstration qui n'écrivaient
+pas leurs règlements — la comptabilité affichait donc zéro recette au premier
+lancement, alors que trois reçus étaient bien émis.
 
 ---
 
@@ -132,7 +143,7 @@ l'aperçu du reçu gris et vide.
 ```bash
 flutter pub get          # installer les dépendances
 flutter run              # lancer sur un téléphone branché ou un émulateur
-flutter test             # les 79 tests
+flutter test             # les 98 tests
 flutter analyze          # l'analyse statique
 flutter build apk --release   # produire l'APK à installer sur Android
 ```

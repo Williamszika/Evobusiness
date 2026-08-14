@@ -21,6 +21,7 @@ class EtatBoutique {
     this.clients = const [],
     this.fournisseurs = const [],
     this.ventes = const [],
+    this.reglements = const [],
     this.depenses = const [],
     this.mouvements = const [],
   });
@@ -31,6 +32,7 @@ class EtatBoutique {
   final List<Client> clients;
   final List<Fournisseur> fournisseurs;
   final List<Vente> ventes;
+  final List<Reglement> reglements;
   final List<Depense> depenses;
   final List<MouvementStock> mouvements;
 
@@ -41,6 +43,7 @@ class EtatBoutique {
     List<Client>? clients,
     List<Fournisseur>? fournisseurs,
     List<Vente>? ventes,
+    List<Reglement>? reglements,
     List<Depense>? depenses,
     List<MouvementStock>? mouvements,
   }) =>
@@ -51,6 +54,7 @@ class EtatBoutique {
         clients: clients ?? this.clients,
         fournisseurs: fournisseurs ?? this.fournisseurs,
         ventes: ventes ?? this.ventes,
+        reglements: reglements ?? this.reglements,
         depenses: depenses ?? this.depenses,
         mouvements: mouvements ?? this.mouvements,
       );
@@ -84,6 +88,10 @@ class EtatBoutique {
     }
     return null;
   }
+
+  /// Encaissements rattachés à une vente, du plus récent au plus ancien.
+  List<Reglement> reglementsDe(String venteId) =>
+      reglements.where((r) => r.venteId == venteId).toList();
 
   /// Ventes d'une cliente, de la plus récente à la plus ancienne.
   List<Vente> ventesDe(String clientId) =>
@@ -175,6 +183,7 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
       clients: await d.lireClients(),
       fournisseurs: await d.lireFournisseurs(),
       ventes: await d.lireVentes(),
+      reglements: await d.lireReglements(),
       depenses: await d.lireDepenses(),
       mouvements: await d.lireMouvements(),
     );
@@ -356,6 +365,16 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
     state = state.copie(ventes: [vente, ...state.ventes]);
     await majParametres(params.copie(compteurRecu: params.compteurRecu + 1));
 
+    if (montantPaye > 0) {
+      await _inscrireReglement(
+        venteId: vente.id,
+        montant: montantPaye,
+        moyenPaiement: moyenPaiement,
+        date: vente.date,
+        motif: 'Vente ${vente.numero}',
+      );
+    }
+
     for (final ligne in vente.lignes) {
       final produit = state.produit(ligne.produitId);
       if (produit == null || produit.estService) continue;
@@ -370,10 +389,41 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
     return vente;
   }
 
+  /// Inscrit un encaissement au registre. C'est lui qui porte la date, et
+  /// donc l'exercice auquel la recette appartient.
+  Future<Reglement> _inscrireReglement({
+    required String venteId,
+    required int montant,
+    required String moyenPaiement,
+    String? date,
+    String? motif,
+  }) async {
+    final reglement = Reglement(
+      id: nouvelId('rgl'),
+      venteId: venteId,
+      date: date ?? Dates.aujourdhui(),
+      montant: montant,
+      moyenPaiement: moyenPaiement,
+      motif: motif,
+      creeLe: DateTime.now().toIso8601String(),
+    );
+    await depot.enregistrerReglement(reglement);
+    state = state.copie(reglements: [reglement, ...state.reglements]);
+    return reglement;
+  }
+
   /// Encaisse un solde restant sur une vente déjà enregistrée.
-  Future<void> encaisserSolde(String venteId, int montant) async {
+  ///
+  /// La date compte : un solde réglé trois mois après la vente est une recette
+  /// du mois où l'argent est arrivé, pas du mois de la vente.
+  Future<void> encaisserSolde(
+    String venteId,
+    int montant, {
+    String? date,
+    String? moyenPaiement,
+  }) async {
     final vente = state.vente(venteId);
-    if (vente == null || vente.estAnnulee) return;
+    if (vente == null || vente.estAnnulee || montant <= 0) return;
     final paye = vente.montantPaye + montant;
     final maj = vente.copie(
       montantPaye: paye,
@@ -384,6 +434,13 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
       ventes: [
         for (final v in state.ventes) if (v.id == venteId) maj else v,
       ],
+    );
+    await _inscrireReglement(
+      venteId: venteId,
+      montant: montant,
+      moyenPaiement: moyenPaiement ?? vente.moyenPaiement,
+      date: date,
+      motif: 'Solde ${vente.numero}',
     );
   }
 
@@ -399,6 +456,20 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
         for (final v in state.ventes) if (v.id == venteId) maj else v,
       ],
     );
+
+    // On n'efface jamais un encaissement passé : la recette d'un mois clos
+    // reste vraie. Le remboursement est une écriture négative, datée du jour.
+    final dejaEncaisse = state
+        .reglementsDe(venteId)
+        .fold(0, (s, r) => s + r.montant);
+    if (dejaEncaisse != 0) {
+      await _inscrireReglement(
+        venteId: venteId,
+        montant: -dejaEncaisse,
+        moyenPaiement: vente.moyenPaiement,
+        motif: 'Remboursement — annulation ${vente.numero}',
+      );
+    }
     for (final ligne in vente.lignes) {
       final produit = state.produit(ligne.produitId);
       if (produit == null || produit.estService) continue;
@@ -428,8 +499,10 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
       }
     }
     await depot.supprimerVente(venteId);
+    await depot.supprimerReglementsDeVente(venteId);
     state = state.copie(
       ventes: state.ventes.where((v) => v.id != venteId).toList(),
+      reglements: state.reglements.where((r) => r.venteId != venteId).toList(),
     );
   }
 

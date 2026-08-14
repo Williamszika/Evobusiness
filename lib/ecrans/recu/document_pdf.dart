@@ -409,6 +409,8 @@ String texteImprimable(String texte) {
       tampon.write('*');
     } else if (unite == 0x2026) {
       tampon.write('...');
+    } else if (unite == 0x2192) {
+      tampon.write('->');
     }
   }
   return tampon.toString().replaceAll(RegExp(r'\s+$'), '');

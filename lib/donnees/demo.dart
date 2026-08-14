@@ -188,6 +188,21 @@ Future<void> installerDemo(Depot depot) async {
   ];
   for (final vente in ventes) {
     await depot.enregistrerVente(vente);
+    // Toute vente encaissée doit porter son règlement : c'est lui qui date la
+    // recette, et sans lui la comptabilité afficherait zéro.
+    if (vente.montantPaye > 0) {
+      await depot.enregistrerReglement(
+        Reglement(
+          id: nouvelId('rgl'),
+          venteId: vente.id,
+          date: vente.date,
+          montant: vente.montantPaye,
+          moyenPaiement: vente.moyenPaiement,
+          motif: 'Vente ${vente.numero}',
+          creeLe: maintenant,
+        ),
+      );
+    }
   }
 
   final depenses = <Depense>[

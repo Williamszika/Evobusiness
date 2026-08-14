@@ -8,6 +8,7 @@ import '../../coeur/theme.dart';
 import '../../etat/boutique.dart';
 import '../../etat/indicateurs.dart';
 import '../clients/fiche_client.dart';
+import '../comptabilite/comptabilite.dart';
 import '../depenses/depenses.dart';
 import '../produits/fiche_produit.dart';
 
@@ -65,6 +66,14 @@ class _RapportsState extends ConsumerState<Rapports> {
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'Comptabilité',
+            icon: const Icon(Icons.account_balance_outlined),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const EcranComptabilite()),
+            ),
+          ),
           IconButton(
             tooltip: 'Dépenses',
             icon: const Icon(Icons.payments_outlined),

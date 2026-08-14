@@ -2,7 +2,8 @@
 
 Application mobile pour une boutique de mèches, perruques et accessoires
 capillaires : catalogue, stock, ventes, **reçus imprimables**, clientes,
-dépenses et rapports. **Fonctionne entièrement hors-ligne.**
+dépenses, rapports et **comptabilité éditable en PDF pour les impôts**.
+**Fonctionne entièrement hors-ligne.**
 
 Développée en **Flutter** — un seul code source pour **iPhone, Android et le
 web**.
@@ -14,7 +15,7 @@ web**.
 ```bash
 flutter pub get               # installer les dépendances
 flutter run                   # lancer sur un téléphone branché ou un émulateur
-flutter test                  # les 79 tests
+flutter test                  # les 98 tests
 flutter analyze               # l'analyse statique
 flutter build apk --release --split-per-abi   # produire les APK à installer
 ```
@@ -79,6 +80,18 @@ automatiquement sur chaque article et chaque vente, bénéfice net, objectif
 mensuel, rapports par période, articles les plus rentables, meilleures
 clientes, canal de vente le plus efficace.
 
+**La comptabilité et les impôts**
+Un **livre de recettes et de dépenses** par mois, trimestre ou année, tenu
+**à l'encaissement** : une recette est datée du jour où l'argent arrive, pas du
+jour de la vente. Un acompte en janvier et son solde en mars comptent donc dans
+deux mois différents, et un mois déjà clos ne se réécrit jamais.
+
+Le bouton **« Éditer le document pour les impôts »** produit un PDF paginé et
+signable : récapitulatif, livre des recettes (date, n° de reçu, cliente, mode de
+paiement), registre des dépenses, ventilation par catégorie, recettes par mode
+de paiement, récapitulatif mois par mois. À imprimer, à archiver, ou à envoyer
+au comptable — voir [`docs/10-comptabilite.md`](docs/10-comptabilite.md).
+
 **La marque**
 Huit logos et trois palettes livrés dans l'application : le choix se fait dans
 Réglages et repeint aussitôt l'app **et le reçu imprimé**. Nom, slogan,
@@ -119,6 +132,7 @@ Couronne, et **tout se change dans Réglages** en quelques secondes.
 | [`docs/07-installer-sur-iphone.md`](docs/07-installer-sur-iphone.md) | Les trois chemins pour installer sur iPhone, et leur coût |
 | [`docs/08-supabase.md`](docs/08-supabase.md) | Synchronisation cloud : architecture, sécurité, ce qui reste à écrire |
 | [`docs/09-serveur-ou-pas.md`](docs/09-serveur-ou-pas.md) | Pourquoi un seul téléphone n'a pas besoin de serveur, et quoi choisir le jour venu |
+| [`docs/10-comptabilite.md`](docs/10-comptabilite.md) | La règle de l'encaissement, le contenu du document fiscal, ce qu'il est et ce qu'il n'est pas |
 | [`docs/logos/`](docs/logos/) | Les 8 logos en SVG |
 
 ---
@@ -128,7 +142,7 @@ Couronne, et **tout se change dans Réglages** en quelques secondes.
 Flutter · Riverpod · SQLite (`sqflite`, SQL écrit à la main, sans génération de
 code) · `pdf` + `printing` pour les reçus · `fl_chart` · `flutter_svg`.
 
-Quatre règles tenues dans tout le code :
+Six règles tenues dans tout le code :
 
 1. **L'argent est stocké en entiers** (centimes). Jamais de décimaux sur une caisse.
 2. **Le prix d'achat est figé sur chaque ligne de vente**, pour que la marge
@@ -137,11 +151,14 @@ Quatre règles tenues dans tout le code :
    de reçu reste réservé, la numérotation n'a jamais de trou.
 4. **Rien ne part à l'imprimante sans être assaini** : les polices du PDF ne
    couvrent que le latin, un émoji laissé tel quel disparaîtrait du reçu.
-5. **Aucune dépendance à un serveur extérieur** : moteur graphique, pdf.js et
+5. **Chaque encaissement porte sa propre date** : c'est lui, et non la vente,
+   qui date une recette. Sans quoi le document fiscal serait faux.
+6. **Aucune dépendance à un serveur extérieur** : moteur graphique, pdf.js et
    SQLite sont livrés avec l'application. Elle ne contacte personne.
 
-`flutter analyze` : aucun problème. `flutter test` : 79 tests, dont le parcours
-complet de vente et la fabrication réelle du PDF dans les deux formats.
+`flutter analyze` : aucun problème. `flutter test` : 98 tests, dont le parcours
+complet de vente, la fabrication réelle du reçu PDF dans les deux formats, et
+celle du document comptable sur plusieurs pages.
 
 Détails dans [`docs/06-plan-flutter.md`](docs/06-plan-flutter.md).
 

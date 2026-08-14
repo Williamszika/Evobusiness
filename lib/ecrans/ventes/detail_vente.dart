@@ -267,6 +267,42 @@ class DetailVente extends ConsumerWidget {
             ],
           ),
 
+          const SizedBox(height: 18),
+          const Etiquette('Encaissements'),
+          Builder(
+            builder: (_) {
+              final reglements = etat.reglementsDe(vente.id);
+              if (reglements.isEmpty) {
+                return const Bloc(
+                  enfant: Text('Aucun encaissement enregistre pour cette vente.'),
+                );
+              }
+              return Card(
+                child: Column(
+                  children: [
+                    for (final r in reglements)
+                      ListTile(
+                        dense: true,
+                        leading: Icon(
+                          r.estRemboursement ? Icons.undo : Icons.south_west,
+                          size: 18,
+                          color: r.estRemboursement ? Etats.critique : Etats.ok,
+                        ),
+                        title: Text(r.motif ?? r.moyenPaiement),
+                        subtitle: Text('${Dates.court(r.date)} - ${r.moyenPaiement}'),
+                        trailing: Text(
+                          p.format(r.montant),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: r.estRemboursement ? Etats.critique : Etats.ok,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+
           if (vente.reste > 0 && !vente.estAnnulee) ...[
             const SizedBox(height: 18),
             FilledButton.icon(
@@ -302,33 +338,49 @@ class DetailVente extends ConsumerWidget {
     final controleur = TextEditingController(
       text: Argent.versSaisie(vente.reste, p.decimales),
     );
+    var date = Dates.aujourdhui();
     final valide = await showDialog<bool>(
       context: context,
-      builder: (c) => AlertDialog(
-        title: const Text('Encaisser le solde'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Reste à payer : ${p.format(vente.reste)}'),
-            const SizedBox(height: 14),
-            ChampMontant(
-              controleur: controleur,
-              libelle: 'Montant reçu',
-              parametres: p,
-              autofocus: true,
-            ),
+      builder: (c) => StatefulBuilder(
+        builder: (c, majBoite) => AlertDialog(
+          title: const Text('Encaisser le solde'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Reste \u00e0 payer : ${p.format(vente.reste)}'),
+              const SizedBox(height: 14),
+              ChampMontant(
+                controleur: controleur,
+                libelle: 'Montant re\u00e7u',
+                parametres: p,
+                autofocus: true,
+              ),
+              const SizedBox(height: 12),
+              // La date de l'encaissement d\u00e9cide du mois o\u00f9 la recette
+              // appara\u00eetra dans le livre de comptes.
+              OutlinedButton.icon(
+                onPressed: () async {
+                  final choix = await choisirDate(c, date);
+                  if (choix != null) majBoite(() => date = choix);
+                },
+                icon: const Icon(Icons.event_outlined, size: 18),
+                label: Text('Re\u00e7u le ${Dates.court(date)}'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Annuler')),
+            FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Encaisser')),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Annuler')),
-          FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Encaisser')),
-        ],
       ),
     );
     final montant = Argent.depuisSaisie(controleur.text) ?? 0;
     controleur.dispose();
     if (valide != true || montant <= 0) return;
-    await ref.read(boutiqueProvider.notifier).encaisserSolde(vente.id, montant);
+    await ref
+        .read(boutiqueProvider.notifier)
+        .encaisserSolde(vente.id, montant, date: date);
     if (context.mounted) message(context, 'Paiement enregistré.');
   }
 }

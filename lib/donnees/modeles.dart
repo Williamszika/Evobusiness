@@ -684,6 +684,59 @@ class Vente {
       );
 }
 
+// ───────────────────────────────────────────────────────────── règlements
+
+/// Un encaissement rattaché à une vente.
+///
+/// Sans cette table, l'application saurait *combien* une cliente a payé, mais
+/// pas *quand*. Or un document fiscal se tient à l'encaissement : un acompte
+/// versé en janvier et le solde en mars appartiennent à deux exercices
+/// différents. C'est ce registre qui permet de dater chaque franc reçu.
+///
+/// Un remboursement est un règlement de montant négatif : on n'efface jamais
+/// un encaissement passé, on l'annule par une écriture datée du jour.
+class Reglement {
+  const Reglement({
+    required this.id,
+    required this.venteId,
+    required this.date,
+    required this.montant,
+    required this.moyenPaiement,
+    required this.creeLe,
+    this.motif,
+  });
+
+  final String id;
+  final String venteId;
+  final String date;
+  final int montant;
+  final String moyenPaiement;
+  final String? motif;
+  final String creeLe;
+
+  bool get estRemboursement => montant < 0;
+
+  Map<String, Object?> versLigne() => {
+        'id': id,
+        'vente_id': venteId,
+        'date': date,
+        'montant': montant,
+        'moyen_paiement': moyenPaiement,
+        'motif': motif,
+        'cree_le': creeLe,
+      };
+
+  factory Reglement.depuisLigne(Map<String, Object?> l) => Reglement(
+        id: l['id'] as String,
+        venteId: l['vente_id'] as String? ?? '',
+        date: l['date'] as String? ?? '',
+        montant: (l['montant'] as num?)?.toInt() ?? 0,
+        moyenPaiement: l['moyen_paiement'] as String? ?? 'Espèces',
+        motif: l['motif'] as String?,
+        creeLe: l['cree_le'] as String? ?? '',
+      );
+}
+
 // ────────────────────────────────────────────────────────────────── dépenses
 
 class Depense {

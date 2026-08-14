@@ -14,7 +14,7 @@ class Depot {
 
   final Database _db;
 
-  static const _versionSchema = 1;
+  static const _versionSchema = 2;
   static const nomFichier = 'boutique.db';
 
   static Future<Depot> ouvrir({String? cheminForce}) async {
@@ -26,6 +26,22 @@ class Depot {
       onCreate: (db, _) async {
         for (final requete in _schema) {
           await db.execute(requete);
+        }
+      },
+      onUpgrade: (db, ancienne, nouvelle) async {
+        // v2 : registre des règlements, pour dater chaque encaissement.
+        if (ancienne < 2) {
+          for (final requete in _schemaReglements) {
+            await db.execute(requete);
+          }
+          // Les ventes déjà enregistrées reçoivent un règlement daté du jour
+          // de la vente : c'est la meilleure information disponible.
+          await db.execute('''
+            INSERT INTO reglements (id, vente_id, date, montant, moyen_paiement, motif, cree_le)
+            SELECT 'rgl_' || id, id, date, montant_paye, moyen_paiement,
+                   'Reprise de l''historique', cree_le
+            FROM ventes WHERE montant_paye > 0 AND statut != 'Annulée'
+          ''');
         }
       },
     );
@@ -92,9 +108,25 @@ class Depot {
       type TEXT NOT NULL, quantite INTEGER NOT NULL,
       stock_apres INTEGER NOT NULL, motif TEXT, vente_id TEXT
     )''',
+    ..._schemaReglements,
     'CREATE INDEX idx_lignes_vente ON lignes_vente(vente_id)',
     'CREATE INDEX idx_ventes_date ON ventes(date)',
     'CREATE INDEX idx_mouvements_produit ON mouvements_stock(produit_id)',
+  ];
+
+  static const _schemaReglements = <String>[
+    '''
+    CREATE TABLE reglements (
+      id TEXT PRIMARY KEY,
+      vente_id TEXT NOT NULL,
+      date TEXT NOT NULL,
+      montant INTEGER NOT NULL,
+      moyen_paiement TEXT NOT NULL,
+      motif TEXT,
+      cree_le TEXT NOT NULL
+    )''',
+    'CREATE INDEX idx_reglements_vente ON reglements(vente_id)',
+    'CREATE INDEX idx_reglements_date ON reglements(date)',
   ];
 
   // ─────────────────────────────────────────────────────────────── lecture
@@ -134,6 +166,11 @@ class Depot {
   Future<List<Fournisseur>> lireFournisseurs() async =>
       (await _db.query('fournisseurs', orderBy: 'nom COLLATE NOCASE'))
           .map(Fournisseur.depuisLigne)
+          .toList();
+
+  Future<List<Reglement>> lireReglements() async =>
+      (await _db.query('reglements', orderBy: 'date DESC, cree_le DESC'))
+          .map(Reglement.depuisLigne)
           .toList();
 
   Future<List<Depense>> lireDepenses() async =>
@@ -197,6 +234,15 @@ class Depot {
   Future<void> supprimerDepense(String id) =>
       _db.delete('depenses', where: 'id = ?', whereArgs: [id]);
 
+  Future<void> enregistrerReglement(Reglement r) => _db.insert(
+        'reglements',
+        r.versLigne(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+  Future<void> supprimerReglementsDeVente(String venteId) =>
+      _db.delete('reglements', where: 'vente_id = ?', whereArgs: [venteId]);
+
   Future<void> enregistrerMouvement(MouvementStock m) => _db.insert(
         'mouvements_stock',
         m.versLigne(),
@@ -233,6 +279,7 @@ class Depot {
         'clients': (await _db.query('clients')),
         'ventes': (await _db.query('ventes')),
         'lignes_vente': (await _db.query('lignes_vente')),
+        'reglements': (await _db.query('reglements')),
         'depenses': (await _db.query('depenses')),
         'mouvements_stock': (await _db.query('mouvements_stock')),
       };
@@ -246,6 +293,7 @@ class Depot {
       'clients',
       'ventes',
       'lignes_vente',
+      'reglements',
       'depenses',
       'mouvements_stock',
     ];
@@ -280,6 +328,7 @@ class Depot {
   Future<void> viderDonnees() async {
     const tables = [
       'mouvements_stock',
+      'reglements',
       'lignes_vente',
       'ventes',
       'depenses',
