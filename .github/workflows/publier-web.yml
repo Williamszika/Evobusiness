@@ -1,7 +1,12 @@
-# Construit la version web et la publie sur GitHub Pages.
+# Construit la version web et la publie sur la branche `gh-pages`.
 #
-# Rien à activer à la main : l'étape « configure-pages » met en place le site
-# au premier passage. L'application est ensuite disponible à l'adresse
+# Pourquoi cette branche plutôt que le mécanisme « GitHub Actions » de Pages :
+# activer un site Pages demande des droits d'administration que le jeton des
+# workflows n'a pas (« Resource not accessible by integration »). Pousser une
+# branche, en revanche, il sait le faire. GitHub sert alors le site depuis
+# `gh-pages`.
+#
+# L'application est disponible à l'adresse
 # https://<compte>.github.io/Evobusiness/ — c'est ce lien qu'on ouvre dans
 # Safari pour l'ajouter à l'écran d'accueil de l'iPhone.
 name: Publier l'application web
@@ -12,16 +17,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
+  group: publication-web
   cancel-in-progress: true
 
 jobs:
-  construire:
+  publier:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,13 +37,6 @@ jobs:
           channel: stable
           cache: true
 
-      # `enablement: true` crée le site GitHub Pages s'il n'existe pas encore :
-      # aucun réglage à faire dans l'interface.
-      - name: Préparer GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - name: Dépendances
         run: flutter pub get
 
@@ -52,7 +48,7 @@ jobs:
 
       # --no-web-resources-cdn : tout est servi depuis l'application, sinon
       # elle ne fonctionnerait plus sans connexion.
-      # --base-href : nom du dépôt, obligatoire pour GitHub Pages.
+      # --base-href : nom du dépôt, obligatoire pour un site de projet.
       - name: Construire la version web
         run: >
           flutter build web --release
@@ -60,16 +56,20 @@ jobs:
           --pwa-strategy offline-first
           --base-href /Evobusiness/
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: build/web
-
-  publier:
-    needs: construire
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploiement.outputs.page_url }}
-    steps:
-      - id: deploiement
-        uses: actions/deploy-pages@v4
+      - name: Publier sur gh-pages
+        run: |
+          cd build/web
+          # Sans ce fichier, GitHub passerait le site par Jekyll et écarterait
+          # certains fichiers du moteur Flutter.
+          touch .nojekyll
+          git init -q
+          git checkout -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Version web ${GITHUB_SHA::7}"
+          git push -f \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
