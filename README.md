@@ -21,6 +21,10 @@ flutter build apk --release --split-per-abi   # produire les APK à installer
 Les APK se retrouvent dans `build/app/outputs/flutter-apk/`. Pour un téléphone
 Android récent, prends `app-arm64-v8a-release.apk`.
 
+**Sur iPhone**, Apple impose de compiler sur un Mac et de signer l'application :
+voir [`docs/07-installer-sur-iphone.md`](docs/07-installer-sur-iphone.md) pour
+les trois chemins possibles, dont un **sans posséder de Mac**.
+
 Aucune génération de code n'est nécessaire : `flutter pub get` suffit.
 
 Au tout premier lancement, l'application installe un **catalogue de
@@ -87,6 +91,8 @@ Couronne, et **tout se change dans Réglages** en quelques secondes.
 | [`docs/04-le-recu.md`](docs/04-le-recu.md) | Les deux formats de reçu et les mentions obligatoires |
 | [`docs/05-fonctionnalites.md`](docs/05-fonctionnalites.md) | Périmètre version 1 / plus tard |
 | [`docs/06-plan-flutter.md`](docs/06-plan-flutter.md) | Paquets, modèle de données, règles de code, tests |
+| [`docs/07-installer-sur-iphone.md`](docs/07-installer-sur-iphone.md) | Les trois chemins pour installer sur iPhone, et leur coût |
+| [`docs/08-supabase.md`](docs/08-supabase.md) | Synchronisation cloud : architecture, sécurité, ce qui reste à écrire |
 | [`docs/logos/`](docs/logos/) | Les 8 logos en SVG |
 
 ---
