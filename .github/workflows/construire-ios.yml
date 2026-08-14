@@ -26,7 +26,7 @@ on:
       - '.github/workflows/construire-ios.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: construction-ios
@@ -79,3 +79,22 @@ jobs:
           path: build/ios/iphoneos/MaBoutique-non-signee.ipa
           retention-days: 90
           if-no-files-found: error
+
+      # Un artifact ne se télécharge qu'en étant connecté à GitHub, et très mal
+      # depuis un téléphone. Une « release » n'a pas ces défauts : adresse
+      # stable, aucun compte demandé, aucune expiration. C'est elle qu'on donne
+      # à quelqu'un qui veut juste installer l'application.
+      - name: Publier une version téléchargeable
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "iphone-v${{ github.run_number }}" \
+            build/ios/iphoneos/MaBoutique-non-signee.ipa \
+            --title "Application iPhone - version ${{ github.run_number }}" \
+            --target "${GITHUB_SHA}" \
+            --notes "Application **non signée** : un iPhone refuse de
+          l'installer telle quelle. La signature se fait depuis un Mac ou un PC
+          avec AltStore ou Sideloadly — mode d'emploi dans
+          [docs/12-installer-depuis-un-mac.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/docs/12-installer-depuis-un-mac.md).
+
+          Construite depuis le commit \`${GITHUB_SHA}\`, après analyse et tests."
