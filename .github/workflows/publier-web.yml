@@ -1,7 +1,7 @@
 # Construit la version web et la publie sur GitHub Pages.
 #
-# À activer une seule fois : Settings → Pages → Source : « GitHub Actions ».
-# L'application est ensuite disponible à l'adresse
+# Rien à activer à la main : l'étape « configure-pages » met en place le site
+# au premier passage. L'application est ensuite disponible à l'adresse
 # https://<compte>.github.io/Evobusiness/ — c'est ce lien qu'on ouvre dans
 # Safari pour l'ajouter à l'écran d'accueil de l'iPhone.
 name: Publier l'application web
@@ -26,10 +26,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Version figée : une nouvelle version de Flutter ne doit pas casser
+      # la publication du jour au lendemain.
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: 3.47.0
           channel: stable
           cache: true
+
+      # `enablement: true` crée le site GitHub Pages s'il n'existe pas encore :
+      # aucun réglage à faire dans l'interface.
+      - name: Préparer GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Dépendances
         run: flutter pub get
