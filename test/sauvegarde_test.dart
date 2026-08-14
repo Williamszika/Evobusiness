@@ -4,6 +4,8 @@ import 'package:evobusiness/coeur/argent.dart';
 import 'package:evobusiness/donnees/depot.dart';
 import 'package:evobusiness/donnees/modeles.dart';
 import 'package:evobusiness/donnees/sauvegarde.dart';
+import 'package:evobusiness/donnees/sauvegarde_io.dart';
+import 'package:evobusiness/donnees/sauvegarde_web.dart';
 import 'package:evobusiness/ecrans/parametres/actions_sauvegarde.dart';
 import 'package:evobusiness/etat/boutique.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,7 +26,10 @@ void main() {
     dossier = Directory.systemTemp.createTempSync('sauvegardes_test');
     boutique = BoutiqueNotifier();
     final depot = await Depot.ouvrir(cheminForce: inMemoryDatabasePath);
-    await boutique.demarrer(depotForce: depot, dossierSauvegardes: dossier);
+    await boutique.demarrer(
+      depotForce: depot,
+      stock: StockFichiers(dossier: dossier),
+    );
     // On repart d'une boutique vide : la démonstration fausserait les comptages.
     await boutique.viderDonnees();
   });
@@ -52,7 +57,7 @@ void main() {
     test('une copie est déposée dès le premier démarrage', () async {
       final fichiers = await boutique.listerSauvegardes();
       expect(fichiers, hasLength(1));
-      expect(fichiers.first.lengthSync(), greaterThan(100));
+      expect(fichiers.first.taille, greaterThan(100));
     });
 
     test('elle ne se réécrit pas à chaque ouverture', () async {
@@ -74,9 +79,9 @@ void main() {
         await Future<void>.delayed(const Duration(milliseconds: 1100));
       }
       final fichiers = await boutique.listerSauvegardes();
-      expect(fichiers, hasLength(Sauvegarde.nombreConserve));
+      expect(fichiers, hasLength(StockSauvegardes.nombreConserve));
       // Et ce sont bien les plus récentes qui restent.
-      final dates = fichiers.map(Sauvegarde.dateDe).whereType<DateTime>().toList();
+      final dates = fichiers.map((c) => c.date).whereType<DateTime>().toList();
       expect(dates.first.isAfter(dates.last), isTrue);
     }, timeout: const Timeout(Duration(seconds: 60)));
 
@@ -84,7 +89,7 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 1100));
       await boutique.sauvegarderMaintenant();
       final fichiers = await boutique.listerSauvegardes();
-      final dates = fichiers.map(Sauvegarde.dateDe).whereType<DateTime>().toList();
+      final dates = fichiers.map((c) => c.date).whereType<DateTime>().toList();
       expect(dates, hasLength(2));
       expect(dates.first.isAfter(dates.last), isTrue);
     });
@@ -99,7 +104,7 @@ void main() {
       await ajouterArticle('Perruque bob');
       expect(boutique.state.produits, hasLength(2));
 
-      await boutique.restaurerFichier(copie!);
+      await boutique.restaurerCopie(copie!);
       expect(boutique.state.produits, hasLength(1));
       expect(boutique.state.produits.first.nom, 'Mèche brésilienne');
     });
@@ -111,7 +116,7 @@ void main() {
       await boutique.viderDonnees();
       expect(boutique.state.produits, isEmpty);
 
-      await boutique.restaurerFichier(copie!);
+      await boutique.restaurerCopie(copie!);
       expect(boutique.state.produits, hasLength(1));
     });
 
@@ -121,7 +126,12 @@ void main() {
       final abime = File('${dossier.path}/pas-du-json.json')
         ..writeAsStringSync('ceci n\'est pas du JSON');
 
-      await expectLater(boutique.restaurerFichier(abime), throwsA(anything));
+      final copieAbimee = CopieSauvegarde(
+        identifiant: abime.path,
+        date: DateTime.now(),
+        taille: abime.lengthSync(),
+      );
+      await expectLater(boutique.restaurerCopie(copieAbimee), throwsA(anything));
       // La boutique est intacte.
       expect(boutique.state.produits, hasLength(1));
     });
@@ -137,9 +147,14 @@ void main() {
     });
 
     test('il revient au bout d\'une semaine', () {
-      expect(rappelSauvegardeNecessaire(Dates.ilYaJours(3)), isFalse);
-      expect(rappelSauvegardeNecessaire(Dates.ilYaJours(7)), isTrue);
-      expect(rappelSauvegardeNecessaire(Dates.ilYaJours(30)), isTrue);
+      expect(rappelSauvegardeNecessaire(Dates.ilYaJours(3), delaiJours: 7), isFalse);
+      expect(rappelSauvegardeNecessaire(Dates.ilYaJours(7), delaiJours: 7), isTrue);
+      expect(rappelSauvegardeNecessaire(Dates.ilYaJours(30), delaiJours: 7), isTrue);
+    });
+
+    test('la version web rappelle plus tôt, tous les trois jours', () {
+      expect(rappelSauvegardeNecessaire(Dates.ilYaJours(2), delaiJours: 3), isFalse);
+      expect(rappelSauvegardeNecessaire(Dates.ilYaJours(4), delaiJours: 3), isTrue);
     });
 
     test('marquer une sortie enregistre la date dans les réglages', () async {
@@ -153,15 +168,15 @@ void main() {
 
   group('Nom et lecture des fichiers', () {
     test('la date se relit depuis le nom du fichier', () async {
-      final fichier = (await boutique.listerSauvegardes()).first;
-      final quand = Sauvegarde.dateDe(fichier);
-      expect(quand, isNotNull);
-      expect(quand!.difference(DateTime.now()).inMinutes.abs(), lessThan(2));
+      final copie = (await boutique.listerSauvegardes()).first;
+      expect(copie.date, isNotNull);
+      expect(copie.date!.difference(DateTime.now()).inMinutes.abs(), lessThan(2));
+      expect(copie.quand, matches(RegExp(r'^\d{2}/\d{2}/\d{4} à \d{2}h\d{2}$')));
     });
 
     test('la taille est affichée lisiblement', () async {
-      final fichier = (await boutique.listerSauvegardes()).first;
-      expect(Sauvegarde.tailleDe(fichier), matches(RegExp(r'^\d+([.,]\d+)? (o|Ko|Mo)$')));
+      final copie = (await boutique.listerSauvegardes()).first;
+      expect(copie.tailleLisible, matches(RegExp(r'^\d+([.,]\d+)? (o|Ko|Mo)$')));
     });
 
     test('aucun fichier partiel ne subsiste après écriture', () async {
@@ -171,6 +186,25 @@ void main() {
           .whereType<File>()
           .where((f) => f.path.endsWith('.partiel'));
       expect(restes, isEmpty);
+    });
+  });
+
+  group('Version web', () {
+    test('aucune copie locale n\'est écrite, et c\'est assumé', () async {
+      const stock = StockIndisponible();
+      expect(stock.disponible, isFalse);
+      expect(await stock.faudraitSauvegarder(), isFalse);
+      expect(await stock.ecrire({'produits': []}), isNull);
+      expect(await stock.lister(), isEmpty);
+    });
+
+    test('relire une copie inexistante échoue franchement', () async {
+      const stock = StockIndisponible();
+      await expectLater(
+        stock.lire(const CopieSauvegarde(
+            identifiant: 'x', date: null, taille: 0)),
+        throwsUnsupportedError,
+      );
     });
   });
 }

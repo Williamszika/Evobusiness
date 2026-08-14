@@ -4,7 +4,8 @@ Application mobile pour une boutique de mèches, perruques et accessoires
 capillaires : catalogue, stock, ventes, **reçus imprimables**, clientes,
 dépenses et rapports. **Fonctionne entièrement hors-ligne.**
 
-Développée en **Flutter** (Android + iOS), un seul code source.
+Développée en **Flutter** — un seul code source pour **iPhone, Android et le
+web**.
 
 ---
 
@@ -13,7 +14,7 @@ Développée en **Flutter** (Android + iOS), un seul code source.
 ```bash
 flutter pub get               # installer les dépendances
 flutter run                   # lancer sur un téléphone branché ou un émulateur
-flutter test                  # les 76 tests
+flutter test                  # les 79 tests
 flutter analyze               # l'analyse statique
 flutter build apk --release --split-per-abi   # produire les APK à installer
 ```
@@ -21,9 +22,19 @@ flutter build apk --release --split-per-abi   # produire les APK à installer
 Les APK se retrouvent dans `build/app/outputs/flutter-apk/`. Pour un téléphone
 Android récent, prends `app-arm64-v8a-release.apk`.
 
-**Sur iPhone**, Apple impose de compiler sur un Mac et de signer l'application :
-voir [`docs/07-installer-sur-iphone.md`](docs/07-installer-sur-iphone.md) pour
-les trois chemins possibles, dont un **sans posséder de Mac**.
+**Sur iPhone**, l'application s'installe en **version web** : on ouvre son
+adresse dans Safari, puis « Partager → Sur l'écran d'accueil ». L'icône se
+place parmi les autres applications, l'app s'ouvre en plein écran et fonctionne
+sans connexion. Aucun compte Apple, aucun App Store, rien à payer — voir
+[`docs/07-installer-sur-iphone.md`](docs/07-installer-sur-iphone.md).
+
+```bash
+flutter build web --release --no-web-resources-cdn \
+  --pwa-strategy offline-first --base-href /Evobusiness/
+```
+
+Le workflow [`publier-web.yml`](.github/workflows/publier-web.yml) le fait tout
+seul à chaque poussée et publie sur GitHub Pages.
 
 Aucune génération de code n'est nécessaire : `flutter pub get` suffit.
 
@@ -70,11 +81,18 @@ Réglages et repeint aussitôt l'app **et le reçu imprimé**. Nom, slogan,
 coordonnées, devise, message de remerciement et politique d'échange sont tous
 modifiables.
 
+**Les photos**
+Chaque article peut porter sa photo. Elle est réduite puis rangée **dans la
+base**, donc elle suit la sauvegarde : un téléphone remplacé retrouve son
+catalogue en images.
+
 **La sauvegarde**
-L'application se sauvegarde **toute seule à chaque ouverture** et garde les
-cinq dernières copies : une fausse manœuvre se rattrape en deux touches. Et
-tant qu'aucune copie n'a été mise à l'abri hors du téléphone, l'accueil le
-rappelle — un bouton, et le fichier part vers Drive, iCloud ou WhatsApp.
+Sur téléphone, l'application se sauvegarde **toute seule à chaque ouverture**
+et garde les cinq dernières copies : une fausse manœuvre se rattrape en deux
+touches. Et tant qu'aucune copie n'a été mise à l'abri hors de l'appareil,
+l'accueil le rappelle — un bouton, et le fichier part vers Drive, iCloud ou
+WhatsApp. En version web le rappel revient tous les trois jours au lieu de
+sept, parce que le navigateur peut faire le ménage dans ses données.
 Un téléphone perdu ne doit pas être un business perdu.
 
 ---
@@ -115,8 +133,10 @@ Quatre règles tenues dans tout le code :
    de reçu reste réservé, la numérotation n'a jamais de trou.
 4. **Rien ne part à l'imprimante sans être assaini** : les polices du PDF ne
    couvrent que le latin, un émoji laissé tel quel disparaîtrait du reçu.
+5. **Aucune dépendance à un serveur extérieur** : moteur graphique, pdf.js et
+   SQLite sont livrés avec l'application. Elle ne contacte personne.
 
-`flutter analyze` : aucun problème. `flutter test` : 76 tests, dont le parcours
+`flutter analyze` : aucun problème. `flutter test` : 79 tests, dont le parcours
 complet de vente et la fabrication réelle du PDF dans les deux formats.
 
 Détails dans [`docs/06-plan-flutter.md`](docs/06-plan-flutter.md).

@@ -1,118 +1,117 @@
-# Installer l'application sur un iPhone
+# Installer l'application sur l'iPhone
 
-Le code est déjà multiplateforme : aucune ligne à réécrire pour iOS. Ce qui
-bloque n'est pas technique, c'est **Apple**.
-
----
-
-## La règle d'Apple, en une phrase
-
-> Une application iPhone ne peut être **compilée que sur un Mac avec Xcode**,
-> et ne peut être **installée que si elle est signée** par un compte Apple.
-
-Il n'existe aucun contournement légal : pas d'équivalent du fichier `.apk`
-qu'on installe directement sur Android. Voici les trois chemins possibles,
-du moins cher au plus confortable.
+**Chemin retenu : la version web installable.** Gratuite, sans compte Apple,
+sans App Store. L'icône s'ajoute à l'écran d'accueil depuis Safari et
+l'application s'ouvre en plein écran, comme n'importe quelle autre.
 
 ---
 
-## Chemin 1 — Un Mac emprunté, gratuit, 7 jours
+## Pourquoi ce chemin
 
-Pour **essayer** l'application, sans rien payer.
+Apple impose une règle simple : une vraie application iPhone ne se compile que
+sur un Mac, et ne s'installe que si elle est signée par un compte Apple. Il
+n'existe aucun équivalent du fichier `.apk` d'Android.
 
-Sur le Mac, avec l'iPhone branché en USB :
+Une application web contourne cette règle entièrement, parce qu'elle n'est pas
+« installée » au sens d'Apple : c'est Safari qui la garde.
 
-```bash
-# une seule fois : installer Flutter et Xcode depuis l'App Store
-git clone <ce dépôt> && cd Evobusiness
-flutter pub get
-open ios/Runner.xcworkspace     # ouvre Xcode
-```
-
-Dans Xcode : onglet **Signing & Capabilities** → cocher *Automatically manage
-signing* → choisir son Apple ID personnel dans *Team* → changer le *Bundle
-Identifier* pour quelque chose d'unique (`com.tonnom.boutique`). Puis :
-
-```bash
-flutter run --release
-```
-
-**La limite :** avec un Apple ID gratuit, l'application **expire au bout de
-7 jours** et refuse de s'ouvrir. Il faut rebrancher l'iPhone au Mac et
-réinstaller. C'est parfait pour tester, inutilisable au quotidien.
-
----
-
-## Chemin 2 — Compte développeur + TestFlight, sans posséder de Mac ⭐
-
-**C'est le chemin que je recommande.** Il coûte **99 $ par an** (le compte
-Apple Developer) et ne demande aucun Mac.
-
-1. Ouvrir un compte sur [developer.apple.com](https://developer.apple.com) —
-   99 $/an, paiement par carte, validation en 24-48 h.
-2. Créer un compte gratuit sur [codemagic.io](https://codemagic.io) et y
-   connecter ce dépôt. Codemagic loue des Mac dans le cloud et offre
-   **500 minutes de compilation par mois** — largement assez, un build prend
-   environ 15 minutes.
-3. Codemagic compile, signe, et envoie l'application dans **TestFlight**.
-4. Sur l'iPhone : installer l'app **TestFlight** depuis l'App Store, et
-   l'application y apparaît. Installation en un bouton.
-
-**La limite :** chaque version installée par TestFlight est valable **90 jours**.
-Passé ce délai, il suffit de renvoyer un nouveau build (quelques minutes) et
-elle se met à jour toute seule. Jusqu'à 100 personnes peuvent l'installer —
-donc une vendeuse supplémentaire plus tard, sans rien changer.
-
----
-
-## Chemin 3 — Publication sur l'App Store
-
-Même compte à 99 $/an, mais l'application est **publiée** : plus de date
-d'expiration, installation depuis l'App Store comme n'importe quelle app, et
-un lien à partager.
-
-Il faut passer la **revue d'Apple** (1 à 3 jours en général), fournir des
-captures d'écran, une description, et une politique de confidentialité — même
-si l'app ne collecte rien, Apple exige la page.
-
-À faire quand la marque sera choisie et l'application rodée. Pas maintenant.
-
----
-
-## Ce qui est déjà prêt côté iOS
-
-- **Version minimum : iOS 15** — couvre tous les iPhone depuis le 6s (2015).
-- **Autorisations déclarées** dans `ios/Runner/Info.plist` : appareil photo et
-  photothèque, avec un texte en français expliquant pourquoi. Sans elles,
-  l'application se fermerait brutalement à la première photo d'article — c'est
-  la première cause de rejet à la revue Apple.
-- **Impression** : `printing` passe par AirPrint, natif sur iPhone. Aucune
-  configuration.
-- **Partage du reçu (PDF, WhatsApp)** : feuille de partage iOS standard.
-- **Nom affiché sous l'icône : « Ma Boutique »** — provisoire, tant que le nom
-  du business n'est pas choisi.
-
-### Changer le nom sous l'icône
-
-Une fois le nom décidé, deux endroits, une ligne chacun :
-
-| Plateforme | Fichier | Clé |
-| --- | --- | --- |
-| iOS | `ios/Runner/Info.plist` | `CFBundleDisplayName` |
-| Android | `android/app/src/main/AndroidManifest.xml` | `android:label` |
-
-Le nom affiché **dans** l'application et sur le reçu, lui, se change
-directement dans Réglages — sans recompiler.
-
----
-
-## Résumé des coûts
-
-| Chemin | Coût | Mac nécessaire | Durée de validité |
+| Chemin | Coût | Mac | Validité |
 | --- | --- | --- | --- |
-| Mac emprunté | gratuit | oui | 7 jours |
-| **TestFlight + Codemagic** | **99 $/an** | **non** | **90 jours, renouvelable** |
-| App Store | 99 $/an | non | permanent |
+| **Version web sur l'écran d'accueil** | **0 €** | **non** | **permanente** |
+| Mac emprunté + Apple ID gratuit | 0 € | oui | 7 jours |
+| Compte développeur + lien privé (TestFlight, Ad Hoc) | 99 $/an | non | 90 jours, renouvelable |
+| Publication App Store | 99 $/an | non | permanente |
 
-Pour Android, rien de tout cela : le fichier APK s'installe directement, sans
-compte ni abonnement.
+---
+
+## Mettre l'application en ligne
+
+Une seule fois, et c'est fait pour toujours.
+
+1. Sur GitHub : **Settings → Pages → Source : « GitHub Actions »**.
+2. Pousser sur la branche : le fichier
+   [`.github/workflows/publier-web.yml`](../.github/workflows/publier-web.yml)
+   lance l'analyse, les tests, la compilation, puis la publication.
+3. L'adresse devient `https://<compte>.github.io/Evobusiness/`.
+
+Rien à payer, rien à administrer. Netlify ou un hébergement classique
+conviennent aussi : il suffit de déposer le contenu de `build/web`.
+
+Pour construire à la main :
+
+```bash
+flutter build web --release --no-web-resources-cdn \
+  --pwa-strategy offline-first --base-href /Evobusiness/
+```
+
+`--no-web-resources-cdn` n'est pas optionnel : sans lui, Flutter va chercher
+son moteur graphique sur un serveur Google et **l'application cesse de
+fonctionner sans connexion**.
+
+---
+
+## L'installer sur l'iPhone
+
+1. Ouvrir l'adresse **dans Safari** (pas Chrome : sur iPhone, seul Safari sait
+   ajouter à l'écran d'accueil).
+2. Toucher le bouton **Partager** (le carré avec la flèche vers le haut).
+3. Choisir **« Sur l'écran d'accueil »**.
+4. Valider. L'icône couronne apparaît parmi les applications.
+
+Ouverte depuis cette icône, elle occupe tout l'écran : ni barre d'adresse, ni
+onglets. Elle fonctionne **sans connexion** dès la deuxième ouverture, tout
+étant enregistré dans le téléphone.
+
+---
+
+## Ce qui a été vérifié
+
+L'application a été lancée dans un navigateur mobile, sur un écran d'iPhone 13,
+et pilotée automatiquement :
+
+- SQLite tourne en WebAssembly dans le navigateur ; les données de démonstration
+  s'affichent bien
+- une vente s'ouvre, le stock se met à jour
+- **le reçu se dessine à l'écran, en A5 et en ticket 80 mm**, avec le logo, les
+  articles, les totaux et le reste à payer
+- **aucun appel réseau externe** : tout est servi par l'application elle-même
+
+Deux défauts ont été trouvés et corrigés lors de cette vérification :
+
+1. Flutter chargeait son moteur graphique depuis un CDN Google — l'application
+   n'aurait pas fonctionné hors connexion.
+2. L'aperçu du reçu chargeait pdf.js depuis un CDN, dans une version trop
+   récente pour beaucoup de navigateurs : l'aperçu restait gris et vide. La
+   bibliothèque est maintenant embarquée, dans une version compatible.
+
+---
+
+## Les limites, dites franchement
+
+**Les données vivent dans le navigateur.** iOS peut faire le ménage dans le
+stockage d'un site resté plusieurs semaines sans être ouvert. Une application
+ajoutée à l'écran d'accueil et utilisée régulièrement est bien mieux traitée,
+mais la garantie n'est pas la même qu'une vraie application.
+
+C'est pourquoi, dans la version web, **l'application réclame une sauvegarde
+tous les trois jours** au lieu de sept, et n'écrit pas de copie automatique
+locale — elle serait effacée en même temps que le reste. La copie qu'elle
+enregistre dans iCloud, Drive ou WhatsApp est la seule vraie protection.
+
+**Pas d'imprimante Bluetooth.** L'impression passe par la boîte de dialogue du
+navigateur, donc par AirPrint. Le ticket 80 mm est produit, mais une thermique
+Bluetooth demanderait une vraie application.
+
+**Premier chargement plus lourd.** Environ 5 Mo à la première ouverture,
+ensuite tout est en cache et l'ouverture est immédiate.
+
+---
+
+## Si un jour vous voulez une vraie application iPhone
+
+Le code Flutter est déjà prêt : le projet `ios/` est configuré, les
+autorisations appareil photo et photothèque sont déclarées, la version minimale
+est iOS 15. Il ne manque que le compte Apple Developer à 99 $/an et une
+compilation — que je peux faire lancer dans le cloud, sans Mac.
+
+Rien de ce qui est écrit aujourd'hui ne serait à jeter.

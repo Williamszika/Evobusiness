@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../donnees/modeles.dart';
 import 'argent.dart';
+import 'images.dart';
 import 'logos.dart';
 import 'theme.dart';
 
@@ -362,14 +361,14 @@ class VignetteProduit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final chemin = produit.photo;
+    final octets = Photos.decoder(produit.photo);
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: SizedBox(
         width: taille,
         height: taille,
-        child: chemin != null && chemin.isNotEmpty && File(chemin).existsSync()
-            ? Image.file(File(chemin), fit: BoxFit.cover)
+        child: octets != null
+            ? Image.memory(octets, fit: BoxFit.cover, gaplessPlayback: true)
             : Container(
                 color: theme.colorScheme.primary.withValues(alpha: .1),
                 alignment: Alignment.center,

@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../coeur/argent.dart';
 import '../../coeur/composants.dart';
 import '../../coeur/constantes.dart';
+import '../../coeur/images.dart';
 import '../../coeur/theme.dart';
 import '../../donnees/modeles.dart';
 import '../../etat/boutique.dart';
@@ -83,14 +82,15 @@ class FicheProduit extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
         children: [
-          if (produit.photo != null && File(produit.photo!).existsSync())
+          if (Photos.decoder(produit.photo) != null)
             ClipRRect(
               borderRadius: BorderRadius.circular(18),
-              child: Image.file(
-                File(produit.photo!),
+              child: Image.memory(
+                Photos.decoder(produit.photo)!,
                 height: 190,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                gaplessPlayback: true,
               ),
             ),
           const SizedBox(height: 14),

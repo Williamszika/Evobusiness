@@ -1,14 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 import '../../coeur/argent.dart';
 import '../../coeur/composants.dart';
 import '../../coeur/constantes.dart';
+import '../../coeur/images.dart';
 import '../../coeur/theme.dart';
 import '../../donnees/modeles.dart';
 import '../../etat/boutique.dart';
@@ -90,22 +87,22 @@ class _EditionProduitState extends ConsumerState<EditionProduit> {
     super.dispose();
   }
 
-  /// La photo choisie est recopiée dans le dossier de l'application :
-  /// le fichier d'origine peut être supprimé de la galerie sans casser la fiche.
+  /// La photo est réduite puis rangée dans la fiche elle-même : elle suit
+  /// donc la sauvegarde, et survit au ménage de la galerie.
   Future<void> _choisirPhoto(ImageSource source) async {
-    final choix = await ImagePicker().pickImage(
-      source: source,
-      maxWidth: 1200,
-      imageQuality: 80,
-    );
-    if (choix == null) return;
-    final dossier = await getApplicationDocumentsDirectory();
-    final photos = Directory(p.join(dossier.path, 'photos'));
-    if (!photos.existsSync()) photos.createSync(recursive: true);
-    final destination = p.join(photos.path, '${nouvelId('img')}${p.extension(choix.path)}');
-    await File(choix.path).copy(destination);
-    if (!mounted) return;
-    setState(() => _photo = destination);
+    try {
+      final choix = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: Photos.largeurMax,
+        imageQuality: Photos.qualite,
+      );
+      if (choix == null) return;
+      final octets = await choix.readAsBytes();
+      if (!mounted) return;
+      setState(() => _photo = Photos.encoder(octets));
+    } catch (e) {
+      if (mounted) message(context, 'Photo impossible : $e', erreur: true);
+    }
   }
 
   Future<void> _enregistrer() async {
@@ -213,8 +210,9 @@ class _EditionProduitState extends ConsumerState<EditionProduit> {
                       borderRadius: BorderRadius.circular(18),
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: _photo != null && File(_photo!).existsSync()
-                        ? Image.file(File(_photo!), fit: BoxFit.cover)
+                    child: Photos.decoder(_photo) != null
+                        ? Image.memory(Photos.decoder(_photo)!,
+                            fit: BoxFit.cover, gaplessPlayback: true)
                         : Icon(
                             Icons.photo_camera_outlined,
                             size: 34,

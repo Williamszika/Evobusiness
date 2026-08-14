@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -449,11 +449,20 @@ class _EcranParametresState extends ConsumerState<EcranParametres> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'L\'application se sauvegarde toute seule à chaque ouverture, '
-                  'et garde les ${Sauvegarde.nombreConserve} dernières copies. '
-                  'Mais ce dossier disparaît si l\'application est désinstallée : '
-                  'une fois par semaine, enregistre une copie dans ton Drive, '
-                  'ton iCloud, ou envoie-la-toi sur WhatsApp.',
+                  kIsWeb
+                      ? 'Cette version s\'ouvre depuis le navigateur : il peut '
+                          'faire le ménage dans ses données après plusieurs '
+                          'semaines sans usage. Enregistre une copie tous les '
+                          'deux ou trois jours dans ton iCloud, ton Drive, ou '
+                          'envoie-la-toi sur WhatsApp. C\'est elle qui protège '
+                          'ton business.'
+                      : 'L\'application se sauvegarde toute seule à chaque '
+                          'ouverture, et garde les '
+                          '${StockSauvegardes.nombreConserve} dernières copies. '
+                          'Mais ce dossier disparaît si l\'application est '
+                          'désinstallée : une fois par semaine, enregistre une '
+                          'copie dans ton Drive, ton iCloud, ou envoie-la-toi '
+                          'sur WhatsApp.',
                   style: theme.textTheme.bodySmall,
                 ),
                 const SizedBox(height: 14),
@@ -482,33 +491,22 @@ class _EcranParametresState extends ConsumerState<EcranParametres> {
           const SizedBox(height: 12),
 
           // Les copies déposées automatiquement par l'application.
-          FutureBuilder<List<File>>(
+          FutureBuilder<List<CopieSauvegarde>>(
             future: ref.read(boutiqueProvider.notifier).listerSauvegardes(),
             builder: (context, instantane) {
-              final fichiers = instantane.data ?? const <File>[];
-              if (fichiers.isEmpty) return const SizedBox.shrink();
+              final copies = instantane.data ?? const <CopieSauvegarde>[];
+              if (copies.isEmpty) return const SizedBox.shrink();
               return Card(
                 child: Column(
                   children: [
-                    for (final fichier in fichiers)
+                    for (final copie in copies)
                       ListTile(
                         dense: true,
                         leading: const Icon(Icons.history, size: 20),
-                        title: Builder(
-                          builder: (_) {
-                            final quand = Sauvegarde.dateDe(fichier);
-                            return Text(
-                              quand == null
-                                  ? 'Sauvegarde'
-                                  : '${Dates.court(Dates.jourIso(quand))} à '
-                                      '${quand.hour.toString().padLeft(2, '0')}h'
-                                      '${quand.minute.toString().padLeft(2, '0')}',
-                            );
-                          },
-                        ),
-                        subtitle: Text(Sauvegarde.tailleDe(fichier)),
+                        title: Text(copie.quand),
+                        subtitle: Text(copie.tailleLisible),
                         trailing: TextButton(
-                          onPressed: () => _restaurerLocale(fichier),
+                          onPressed: () => _restaurerLocale(copie),
                           child: const Text('Restaurer'),
                         ),
                       ),
@@ -629,23 +627,17 @@ class _EcranParametresState extends ConsumerState<EcranParametres> {
 
   /// Restaure la boutique depuis l'une des copies déposées automatiquement
   /// par l'application.
-  Future<void> _restaurerLocale(File fichier) async {
-    final quand = Sauvegarde.dateDe(fichier);
+  Future<void> _restaurerLocale(CopieSauvegarde copie) async {
     final ok = await confirmer(
       context,
       titre: 'Revenir à cette sauvegarde ?',
-      texte: quand == null
-          ? 'Le contenu actuel sera remplacé.'
-          : 'Le contenu actuel sera remplacé par celui du '
-              '${Dates.court(Dates.jourIso(quand))} à '
-              '${quand.hour.toString().padLeft(2, '0')}h'
-              '${quand.minute.toString().padLeft(2, '0')}.',
+      texte: 'Le contenu actuel sera remplacé par celui du ${copie.quand}.',
       valider: 'Restaurer',
       dangereux: true,
     );
     if (!ok) return;
     try {
-      await ref.read(boutiqueProvider.notifier).restaurerFichier(fichier);
+      await ref.read(boutiqueProvider.notifier).restaurerCopie(copie);
       if (!mounted) return;
       setState(() => _p = ref.read(boutiqueProvider).parametres);
       message(context, 'Boutique restaurée.');

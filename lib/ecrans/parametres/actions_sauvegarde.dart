@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,16 +11,21 @@ import '../../coeur/composants.dart';
 import '../../etat/boutique.dart';
 
 /// Nombre de jours au-delà duquel l'accueil rappelle de sortir une copie.
-const delaiRappelSauvegarde = 7;
+///
+/// Plus court dans la version web : le navigateur peut faire le ménage dans
+/// ses données après quelques semaines sans usage, alors qu'une application
+/// installée garde les siennes.
+int get delaiRappelSauvegarde => kIsWeb ? 3 : 7;
 
 /// Faut-il rappeler de mettre une sauvegarde à l'abri ?
 ///
 /// L'application se sauvegarde toute seule dans son propre dossier, mais ce
 /// dossier disparaît avec l'application. Une copie sortie vers Drive, iCloud
 /// ou WhatsApp est la seule qui survive à un téléphone perdu.
-bool rappelSauvegardeNecessaire(String derniereSortieLe) {
+bool rappelSauvegardeNecessaire(String derniereSortieLe, {int? delaiJours}) {
   if (derniereSortieLe.isEmpty) return true;
-  return Dates.joursDepuis(derniereSortieLe.split('T').first) >= delaiRappelSauvegarde;
+  return Dates.joursDepuis(derniereSortieLe.split('T').first) >=
+      (delaiJours ?? delaiRappelSauvegarde);
 }
 
 /// Écrit la boutique dans un fichier que l'utilisatrice range où elle veut :

@@ -1,0 +1,65 @@
+# Construit la version web et la publie sur GitHub Pages.
+#
+# À activer une seule fois : Settings → Pages → Source : « GitHub Actions ».
+# L'application est ensuite disponible à l'adresse
+# https://<compte>.github.io/Evobusiness/ — c'est ce lien qu'on ouvre dans
+# Safari pour l'ajouter à l'écran d'accueil de l'iPhone.
+name: Publier l'application web
+
+on:
+  push:
+    branches: [main, claude/hair-sales-management-app-wfpe8z]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Dépendances
+        run: flutter pub get
+
+      - name: Analyse
+        run: flutter analyze
+
+      - name: Tests
+        run: flutter test
+
+      # --no-web-resources-cdn : tout est servi depuis l'application, sinon
+      # elle ne fonctionnerait plus sans connexion.
+      # --base-href : nom du dépôt, obligatoire pour GitHub Pages.
+      - name: Construire la version web
+        run: >
+          flutter build web --release
+          --no-web-resources-cdn
+          --pwa-strategy offline-first
+          --base-href /Evobusiness/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  publier:
+    needs: construire
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - id: deploiement
+        uses: actions/deploy-pages@v4

@@ -13,14 +13,14 @@ paquets utilisés sont éprouvés et gratuits.
 
 | Besoin | Solution | Pourquoi celle-là |
 | --- | --- | --- |
-| Base de données locale | `sqflite` (SQLite), SQL écrit à la main | Marche sans internet. **Écart avec le plan** : `drift` était prévu, mais il impose une génération de code (`build_runner`) à chaque modification ; avec `sqflite`, un simple `flutter pub get` suffit pour compiler le projet |
+| Base de données locale | `sqflite` (+ `sqflite_common_ffi_web` pour le navigateur), SQL écrit à la main | Marche sans internet. **Écart avec le plan** : `drift` était prévu, mais il impose une génération de code (`build_runner`) à chaque modification ; avec `sqflite`, un simple `flutter pub get` suffit pour compiler le projet |
 | Organisation de l'app | `flutter_riverpod` | La référence actuelle pour tenir l'état d'une app Flutter quand elle grandit |
 | Reçu PDF & impression | `pdf` + `printing` | Le duo standard : fabrique le A5, montre l'aperçu, parle à l'imprimante et à AirPrint |
 | Partage du reçu | `printing` (`Printing.sharePdf`) | Ouvre la feuille de partage du téléphone — WhatsApp, mail, Drive |
 | Message WhatsApp | `url_launcher` (`wa.me`) | Ouvre la conversation avec le détail de la vente déjà rédigé |
 | Graphiques | `fl_chart` | Léger, et il se colore avec la palette de la marque |
 | Logos | `flutter_svg` | Le **même** texte SVG sert à l'écran et au PDF : un seul logo, jamais deux versions à maintenir |
-| Photos d'articles | `image_picker` + `path_provider` | Photo prise avec l'appareil, recopiée dans l'app pour survivre au ménage de la galerie |
+| Photos d'articles | `image_picker` | Photo réduite à 800 px puis stockée **en base64 dans la base** : elle suit la sauvegarde, et le même code marche sur téléphone et sur le web |
 | Français & devises | `intl` + `flutter_localizations` | Dates et montants au format local |
 | Sauvegarde | `file_picker` + `path_provider` | Copies automatiques dans le dossier de l'application, et fichier JSON à mettre à l'abri |
 
@@ -104,7 +104,7 @@ modification.
 
 ## Les tests
 
-`flutter test` — **76 tests**, tous au vert.
+`flutter test` — **79 tests**, tous au vert.
 
 | Fichier | Ce qu'il vérifie |
 | --- | --- |
@@ -115,11 +115,15 @@ modification.
 | `test/sauvegarde_test.dart` | Sauvegarde automatique : déclenchement, rotation sur cinq copies, restauration qui rattrape un « Repartir de zéro », fichier illisible sans dégât, rappel hebdomadaire |
 | `test/ecrans_test.dart` | L'application se lance, les cinq onglets se dessinent sur un écran de téléphone, la recherche filtre, et le **parcours complet de vente** enregistre bien la vente et décrémente le stock |
 
-Quatre bugs réels ont été trouvés par ces tests pendant le développement :
+Six bugs réels ont été trouvés pendant le développement, par les tests puis
+par la vérification en navigateur :
 l'espace fine insécable des milliers qui disparaissait du reçu imprimé
 (« 38 000 » devenait « 38000 »), deux débordements de mise en page sur écran
-étroit, et deux sauvegardes lancées dans la même seconde qui s'écrasaient
-l'une l'autre.
+étroit, deux sauvegardes lancées dans la même seconde qui s'écrasaient l'une
+l'autre, le moteur graphique de Flutter chargé depuis un CDN (l'application
+n'aurait plus fonctionné hors connexion), et pdf.js chargé depuis un CDN dans
+une version trop récente pour beaucoup de navigateurs, ce qui laissait
+l'aperçu du reçu gris et vide.
 
 ---
 
@@ -128,7 +132,7 @@ l'une l'autre.
 ```bash
 flutter pub get          # installer les dépendances
 flutter run              # lancer sur un téléphone branché ou un émulateur
-flutter test             # les 76 tests
+flutter test             # les 79 tests
 flutter analyze          # l'analyse statique
 flutter build apk --release   # produire l'APK à installer sur Android
 ```

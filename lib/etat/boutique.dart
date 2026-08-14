@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../coeur/argent.dart';
 import '../coeur/constantes.dart';
@@ -110,11 +107,11 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
   BoutiqueNotifier() : super(const EtatBoutique());
 
   Depot? _depot;
-  Directory? _dossierSauvegardes;
+  StockSauvegardes _stock = const _StockAbsent();
 
-  /// Dossier des sauvegardes automatiques. `null` si le système ne l'a pas
-  /// fourni — la sauvegarde est alors désactivée, sans jamais bloquer l'app.
-  Directory? get dossierSauvegardes => _dossierSauvegardes;
+  /// Où l'application dépose ses copies automatiques. Indisponible dans la
+  /// version web, qui n'a pas d'endroit durable où écrire.
+  StockSauvegardes get stockSauvegardes => _stock;
 
   Depot get depot {
     final d = _depot;
@@ -123,8 +120,8 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
   }
 
   /// Ouvre la base, installe la démonstration au premier lancement,
-  /// charge tout en mémoire, puis dépose une sauvegarde du jour.
-  Future<void> demarrer({Depot? depotForce, Directory? dossierSauvegardes}) async {
+  /// charge tout en mémoire, puis dépose une copie du jour.
+  Future<void> demarrer({Depot? depotForce, StockSauvegardes? stock}) async {
     final d = depotForce ?? await Depot.ouvrir();
     _depot = d;
     if (await d.estVide) {
@@ -132,50 +129,34 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
     }
     await recharger();
 
-    _dossierSauvegardes = dossierSauvegardes ?? await _dossierParDefaut();
+    _stock = stock ?? creerStockSauvegardes();
+    await _stock.preparer();
     await sauvegardeAutomatique();
   }
 
-  /// Le dossier de l'application, s'il est accessible. Une erreur ici ne doit
-  /// jamais empêcher la boutique de s'ouvrir : on renonce simplement à la
-  /// sauvegarde automatique.
-  Future<Directory?> _dossierParDefaut() async {
-    try {
-      final racine = await getApplicationDocumentsDirectory();
-      return Sauvegarde.dossierDans(racine);
-    } catch (_) {
-      return null;
-    }
-  }
-
   /// Dépose une copie complète si la dernière commence à dater.
-  Future<File?> sauvegardeAutomatique() async {
-    final dossier = _dossierSauvegardes;
-    if (dossier == null) return null;
+  Future<CopieSauvegarde?> sauvegardeAutomatique() async {
+    if (!_stock.disponible) return null;
     try {
-      if (!await Sauvegarde.faudraitSauvegarder(dossier)) return null;
-      return await Sauvegarde.ecrire(dossier, await depot.exporterJson());
+      if (!await _stock.faudraitSauvegarder()) return null;
+      return await _stock.ecrire(await depot.exporterJson());
     } catch (_) {
+      // Une sauvegarde ratée ne doit jamais empêcher de travailler.
       return null;
     }
   }
 
-  /// Force une sauvegarde immédiate, quelle que soit la date de la précédente.
-  Future<File?> sauvegarderMaintenant() async {
-    final dossier = _dossierSauvegardes;
-    if (dossier == null) return null;
-    return Sauvegarde.ecrire(dossier, await depot.exporterJson());
+  /// Force une copie immédiate, quelle que soit la date de la précédente.
+  Future<CopieSauvegarde?> sauvegarderMaintenant() async {
+    if (!_stock.disponible) return null;
+    return _stock.ecrire(await depot.exporterJson());
   }
 
-  Future<List<File>> listerSauvegardes() async {
-    final dossier = _dossierSauvegardes;
-    if (dossier == null) return const [];
-    return Sauvegarde.lister(dossier);
-  }
+  Future<List<CopieSauvegarde>> listerSauvegardes() => _stock.lister();
 
-  /// Restaure la boutique depuis un fichier de sauvegarde local.
-  Future<void> restaurerFichier(File fichier) async {
-    await importer(await Sauvegarde.lire(fichier));
+  /// Restaure la boutique depuis l'une des copies automatiques.
+  Future<void> restaurerCopie(CopieSauvegarde copie) async {
+    await importer(await _stock.lire(copie));
   }
 
   /// Note qu'une copie vient d'être sortie de l'application (Drive, iCloud,
@@ -501,6 +482,24 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
     await installerDemo(depot);
     await recharger();
   }
+}
+
+/// Stock inerte utilisé avant l'appel à `demarrer`.
+class _StockAbsent implements StockSauvegardes {
+  const _StockAbsent();
+  @override
+  bool get disponible => false;
+  @override
+  Future<void> preparer() async {}
+  @override
+  Future<List<CopieSauvegarde>> lister() async => const [];
+  @override
+  Future<CopieSauvegarde?> ecrire(Map<String, dynamic> donnees) async => null;
+  @override
+  Future<Map<String, dynamic>> lire(CopieSauvegarde copie) async =>
+      throw StateError('Aucun stock de sauvegardes.');
+  @override
+  Future<bool> faudraitSauvegarder() async => false;
 }
 
 final boutiqueProvider =

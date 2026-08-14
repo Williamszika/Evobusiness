@@ -219,7 +219,11 @@ class Produit {
   final int stock;
   final int seuilAlerte;
   final String? fournisseurId;
+
+  /// Photo de l'article, encodée en base64 et stockée dans la base — voir
+  /// `coeur/images.dart`. Elle suit donc la sauvegarde.
   final String? photo;
+
   final String? description;
   final bool actif;
   final String creeLe;
