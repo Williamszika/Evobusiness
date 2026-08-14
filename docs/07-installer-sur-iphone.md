@@ -65,7 +65,7 @@ La branche `web-cdn` contient une version compilée pour être servie par
 `githack.com`, un relais public qui sert les fichiers d'un dépôt GitHub avec les
 bons types MIME — y compris `application/wasm`, indispensable ici.
 
-    https://raw.githack.com/Williamszika/Evobusiness/web-cdn/v2/
+    https://raw.githack.com/Williamszika/Evobusiness/web-cdn/app/
 
 C'est un dépannage, pas un hébergement : ce relais est un service bénévole,
 avec des limites de débit et aucune garantie de durée. Il permet d'essayer
@@ -73,13 +73,18 @@ l'application tout de suite ; il ne doit pas rester l'adresse d'un outil de
 travail quotidien. La branche `web-cdn` peut être supprimée une fois le vrai
 hébergement en place.
 
-**Le `/v2/` n'est pas décoratif.** Ce relais met les fichiers en cache par
-adresse et ne les relit plus : republier au même endroit continuait de servir
-l'ancienne version, sans la comptabilité. Chaque livraison part donc dans un
-dossier neuf, et **l'adresse change à chaque fois** — ce qui oblige à refaire
-« Sur l'écran d'accueil ». Raison de plus de ne pas s'installer durablement
-ici : avec GitHub Pages, l'adresse ne bouge plus jamais et les mises à jour
-arrivent toutes seules.
+**Le compromis assumé de `/app/`.** Ce relais met les fichiers en cache par
+adresse : republier au même endroit sert l'ancienne version pendant un moment.
+Un dossier neuf à chaque livraison réglerait cela, mais changerait l'adresse à
+chaque fois — donc obligerait à refaire « Sur l'écran d'accueil », ce qui est
+inacceptable dès qu'on a donné le lien à quelqu'un.
+
+L'adresse est donc figée à `/app/`, et **c'est la fraîcheur qu'on sacrifie, pas
+la stabilité** : une mise à jour met un moment à parvenir. L'application étant
+prévue pour fonctionner hors connexion, elle continue de tourner entre-temps.
+
+Avec GitHub Pages, ce compromis disparaît : adresse fixe **et** mise à jour
+immédiate.
 
 ### Pourquoi une branche plutôt que le mode « GitHub Actions »
 

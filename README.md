@@ -135,6 +135,7 @@ Couronne, et **tout se change dans Réglages** en quelques secondes.
 | [`docs/10-comptabilite.md`](docs/10-comptabilite.md) | La règle de l'encaissement, le contenu du document fiscal, ce qu'il est et ce qu'il n'est pas |
 | [`docs/11-application-iphone.md`](docs/11-application-iphone.md) | Version web ou vraie application iPhone : ce que ça change, ce que ça coûte, ce que je recommande |
 | [`docs/12-installer-depuis-un-mac.md`](docs/12-installer-depuis-un-mac.md) | Installer l'application native depuis un Mac, gratuitement, et transférer les données |
+| [`docs/13-donner-l-application-a-quelqu-un.md`](docs/13-donner-l-application-a-quelqu-un.md) | **La remettre à quelqu'un d'autre** : le message à lui envoyer, et ce qu'elle doit savoir |
 | [`docs/logos/`](docs/logos/) | Les 8 logos en SVG |
 
 ---
