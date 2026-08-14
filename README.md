@@ -133,6 +133,7 @@ Couronne, et **tout se change dans Réglages** en quelques secondes.
 | [`docs/08-supabase.md`](docs/08-supabase.md) | Synchronisation cloud : architecture, sécurité, ce qui reste à écrire |
 | [`docs/09-serveur-ou-pas.md`](docs/09-serveur-ou-pas.md) | Pourquoi un seul téléphone n'a pas besoin de serveur, et quoi choisir le jour venu |
 | [`docs/10-comptabilite.md`](docs/10-comptabilite.md) | La règle de l'encaissement, le contenu du document fiscal, ce qu'il est et ce qu'il n'est pas |
+| [`docs/11-application-iphone.md`](docs/11-application-iphone.md) | Version web ou vraie application iPhone : ce que ça change, ce que ça coûte, ce que je recommande |
 | [`docs/logos/`](docs/logos/) | Les 8 logos en SVG |
 
 ---
