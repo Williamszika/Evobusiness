@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <base href="/Williamszika/Evobusiness/web-cdn/">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description"
+        content="Gestion de boutique de mèches et perruques : stock, ventes, reçus imprimables, clientes, dépenses et rapports.">
+
+  <!-- Écran d'accueil iPhone : sans ces trois lignes, l'icône ajoutée
+       depuis Safari s'ouvre dans un onglet au lieu de faire plein écran. -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ma Boutique">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+  <meta name="theme-color" content="#6E1F46">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <title>Ma Boutique</title>
+
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #F7F2F4; }
+    /* Voile de chargement : le premier démarrage télécharge SQLite en
+       WebAssembly, mieux vaut montrer quelque chose que du blanc. */
+    #demarrage {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 18px;
+      background: #F7F2F4; font-family: system-ui, sans-serif; color: #6E1F46;
+      transition: opacity .35s ease;
+    }
+    #demarrage.parti { opacity: 0; pointer-events: none; }
+    #demarrage svg { width: 76px; height: 76px; }
+    #demarrage p { margin: 0; font-size: 14px; color: #8A7580; }
+    @keyframes battement { 0%,100% { opacity: 1 } 50% { opacity: .45 } }
+    #demarrage svg { animation: battement 1.6s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { #demarrage svg { animation: none } }
+  </style>
+</head>
+<body>
+  <div id="demarrage">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" aria-hidden="true">
+      <path d="M14 68 L20 30 C24 40 30 46 34 46 C40 46 42 22 48 22 C54 22 56 46 62 46 C66 46 72 40 76 30 L82 68 Z" fill="#6E1F46"/>
+      <rect x="14" y="71" width="68" height="9" rx="4.5" fill="#6E1F46"/>
+      <circle cx="48" cy="18" r="4.5" fill="#A9732E"/>
+      <circle cx="20" cy="26" r="3.5" fill="#A9732E"/>
+      <circle cx="76" cy="26" r="3.5" fill="#A9732E"/>
+    </svg>
+    <p>Ouverture de la boutique…</p>
+  </div>
+
+  <!--
+    L'aperçu du reçu s'appuie sur pdf.js. Par défaut le paquet le télécharge
+    depuis un CDN : l'application ne marcherait plus hors connexion, et chaque
+    reçu consulté préviendrait un tiers. On le charge donc depuis
+    l'application, et on le prépare nous-mêmes — le réglage automatique du
+    worker par le paquet ne prend pas, ce qui laissait l'aperçu vide.
+  -->
+  <script type="module">
+    import * as pdfjs from './pdfjs/pdf.min.mjs';
+    pdfjs.GlobalWorkerOptions.workerSrc =
+      new URL('./pdfjs/pdf.worker.min.mjs', document.baseURI).href;
+    window.pdfjsLib = pdfjs;
+  </script>
+
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var voile = document.getElementById('demarrage');
+      if (!voile) return;
+      voile.classList.add('parti');
+      setTimeout(function () { voile.remove(); }, 400);
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
