@@ -563,6 +563,34 @@ class _EcranParametresState extends ConsumerState<EcranParametres> {
                     if (context.mounted) message(context, 'Données effacées.');
                   },
                 ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.restart_alt, color: Etats.critique),
+                  title: const Text('Remettre à neuf'),
+                  subtitle: const Text(
+                    'Efface tout, y compris le nom du business et les '
+                    'réglages. À faire avant de confier l\'application à '
+                    'quelqu\'un d\'autre : elle redemandera son nom.',
+                  ),
+                  onTap: () async {
+                    final ok = await confirmer(
+                      context,
+                      titre: 'Remettre à neuf ?',
+                      texte:
+                          'Tout disparaît : articles, ventes, clientes, '
+                          'dépenses, et jusqu\'au nom de la boutique. '
+                          'L\'application se rouvrira comme au premier jour. '
+                          'Fais une sauvegarde avant si tu veux pouvoir '
+                          'revenir en arrière.',
+                      valider: 'Remettre à neuf',
+                      dangereux: true,
+                    );
+                    if (!ok) return;
+                    await ref.read(boutiqueProvider.notifier).remettreANeuf();
+                    // Aucune navigation à faire : l'application observe la
+                    // marque et rouvre l'écran de bienvenue d'elle-même.
+                  },
+                ),
               ],
             ),
           ),

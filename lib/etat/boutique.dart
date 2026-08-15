@@ -555,6 +555,19 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
     await installerDemo(depot);
     await recharger();
   }
+
+  /// Efface tout, **y compris la marque et les réglages** : l'application
+  /// revient exactement à l'état de sa toute première ouverture, et redemande
+  /// son nom.
+  ///
+  /// `viderDonnees` ne suffisait pas pour ça : il garde délibérément la marque,
+  /// ce qu'on veut quand on nettoie sa propre boutique, mais jamais quand on
+  /// remet l'appareil à quelqu'un d'autre.
+  Future<void> remettreANeuf() async {
+    await depot.viderDonnees();
+    await depot.ecrireParametres(const Parametres());
+    await recharger();
+  }
 }
 
 /// Stock inerte utilisé avant l'appel à `demarrer`.

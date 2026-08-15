@@ -148,6 +148,37 @@ void main() {
       expect(boutique.state.parametres.ville, 'Yaoundé');
     });
 
+    test('« Remettre à neuf » efface jusqu\'au nom, et rouvre l\'accueil',
+        () async {
+      await boutique.reinstallerDemo();
+      await boutique.majParametres(
+        boutique.state.parametres.copie(
+          nomBoutique: 'Chez Aminata',
+          telephone: '+237 6 90 11 22 33',
+          ville: 'Yaoundé',
+        ),
+      );
+
+      await boutique.remettreANeuf();
+
+      expect(boutique.state.produits, isEmpty);
+      expect(boutique.state.ventes, isEmpty);
+      expect(boutique.state.clients, isEmpty);
+      // Le point de toute l'affaire : plus de trace de la vendeuse précédente.
+      expect(boutique.state.parametres.nomBoutique, isEmpty);
+      expect(boutique.state.parametres.telephone, isEmpty);
+      expect(boutique.state.parametres.ville, isEmpty);
+      expect(boutique.state.parametres.estConfiguree, isFalse);
+      expect(boutique.state.parametres.compteurRecu, 1);
+    });
+
+    // Il n'y a délibérément pas de test de widget montant l'application
+    // entière après une remise à neuf : le retour à l'écran de bienvenue ne
+    // dépend que de `estConfiguree`, vérifié juste au-dessus, et l'aiguillage
+    // de `app.dart` sur ce même drapeau est déjà couvert par « l'écran de
+    // bienvenue s'affiche au lieu de la boutique ». Monter la boutique
+    // complète n'ajoutait aucune garantie, et la faisait expirer.
+
     test('« Repartir de zéro » vide tout mais garde la marque', () async {
       await boutique.reinstallerDemo();
       await boutique.majParametres(
