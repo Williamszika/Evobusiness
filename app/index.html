@@ -21,6 +21,52 @@
   <link rel="manifest" href="manifest.json">
   <title>Ma Boutique</title>
 
+  <!-- Accorde l'icône d'écran d'accueil au logo choisi dans l'application.
+       Sans cela, une boutique qui choisit « La Boucle » porterait quand même
+       la couronne livrée par défaut sur l'écran d'accueil du téléphone.
+
+       iOS refuse une icône en SVG : on la rastérise donc en PNG par un canvas,
+       ce que le navigateur fait mieux que nous. iOS lit l'icône au moment du
+       « Sur l'écran d'accueil », il suffit donc que la page porte la bonne. -->
+  <script>
+    window.majIconeAccueil = function (svg, nom) {
+      try {
+        var source = 'data:image/svg+xml;base64,' +
+          btoa(unescape(encodeURIComponent(svg)));
+        var img = new Image();
+        img.onload = function () {
+          [180, 192, 512].forEach(function (taille) {
+            var toile = document.createElement('canvas');
+            toile.width = toile.height = taille;
+            var ctx = toile.getContext('2d');
+            ctx.drawImage(img, 0, 0, taille, taille);
+            var png = toile.toDataURL('image/png');
+            if (taille === 180) {
+              poser('apple-touch-icon', png);
+              poser('icon', png);
+            }
+          });
+        };
+        // Une icône ratée ne doit jamais empêcher d'ouvrir la boutique.
+        img.onerror = function () {};
+        img.src = source;
+
+        var titre = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+        if (titre && nom) titre.setAttribute('content', nom);
+      } catch (e) {}
+    };
+
+    function poser(rel, href) {
+      document.querySelectorAll('link[rel="' + rel + '"]').forEach(function (n) {
+        n.parentNode.removeChild(n);
+      });
+      var lien = document.createElement('link');
+      lien.setAttribute('rel', rel);
+      lien.setAttribute('href', href);
+      document.head.appendChild(lien);
+    }
+  </script>
+
   <style>
     html, body { margin: 0; padding: 0; height: 100%; background: #F7F2F4; }
     /* Voile de chargement : le premier démarrage télécharge SQLite en
