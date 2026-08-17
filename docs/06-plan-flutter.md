@@ -84,7 +84,8 @@ lib/
     argent.dart          montants en centimes, dates, identifiants
     constantes.dart      catégories, textures, longueurs, couleurs, devises
     theme.dart           les trois palettes et le thème Material 3
-    logos.dart           les huit logos en SVG
+    logos.dart           les huit logos en SVG, et l'icône d'écran d'accueil
+    icone_appareil.dart  accorde l'icône du téléphone au logo choisi (web)
     composants.dart      tuiles, pastilles, champs, blocs partagés
   donnees/
     modeles.dart         Produit, Client, Vente, LigneVente, Dépense…
@@ -119,7 +120,7 @@ modification.
 
 ## Les tests
 
-`flutter test` — **109 tests**, tous au vert.
+`flutter test` — **116 tests**, tous au vert.
 
 | Fichier | Ce qu'il vérifie |
 | --- | --- |
@@ -129,6 +130,7 @@ modification.
 | `test/recu_test.dart` | Le PDF se fabrique vraiment en A5 et en ticket, pour les huit logos et les trois palettes, à crédit comme annulé ; assainissement du texte imprimé ; message WhatsApp |
 | `test/sauvegarde_test.dart` | Sauvegarde automatique : déclenchement, rotation sur cinq copies, restauration qui rattrape un « Repartir de zéro », fichier illisible sans dégât, rappel hebdomadaire |
 | `test/ecrans_test.dart` | L'application se lance, les cinq onglets se dessinent sur un écran de téléphone, la recherche filtre, et le **parcours complet de vente** enregistre bien la vente et décrémente le stock |
+| `test/icone_test.dart` | L'icône d'écran d'accueil se fabrique pour les huit logos : carré plein sans transparence, sans coin arrondi, aux couleurs de la marque, avec les initiales pour le monogramme seul |
 | `test/bienvenue_test.dart` | La boutique s'ouvre **vide** ; sans nom elle n'est pas configurée et le bouton reste inerte ; saisir un nom ouvre la boutique avec le reçu n° 1 ; la démonstration se nomme elle-même mais **n'écrase jamais** la marque d'une vraie boutique |
 | `test/comptabilite_test.dart` | Le bilan d'une période : la vente comptant tombe dans son mois, **l'acompte et le solde dans deux mois différents**, l'impayé n'est pas une recette, le remboursement n'efface pas le passé ; le document PDF se fabrique sur une période vide comme sur une année à 60 encaissements ; et l'invariant « toute vente encaissée porte ses règlements » |
 
@@ -151,7 +153,7 @@ lancement, alors que trois reçus étaient bien émis.
 ```bash
 flutter pub get          # installer les dépendances
 flutter run              # lancer sur un téléphone branché ou un émulateur
-flutter test             # les 109 tests
+flutter test             # les 116 tests
 flutter analyze          # l'analyse statique
 flutter build apk --release   # produire l'APK à installer sur Android
 ```

@@ -15,7 +15,7 @@ web**.
 ```bash
 flutter pub get               # installer les dépendances
 flutter run                   # lancer sur un téléphone branché ou un émulateur
-flutter test                  # les 109 tests
+flutter test                  # les 116 tests
 flutter analyze               # l'analyse statique
 flutter build apk --release --split-per-abi   # produire les APK à installer
 ```
@@ -99,8 +99,10 @@ de paiement, récapitulatif mois par mois. À imprimer, à archiver, ou à envoy
 au comptable — voir [`docs/10-comptabilite.md`](docs/10-comptabilite.md).
 
 **La marque**
-Huit logos et trois palettes livrés dans l'application : le choix se fait dans
-Réglages et repeint aussitôt l'app **et le reçu imprimé**. Nom, slogan,
+Huit logos et trois palettes livrés dans l'application : le choix se fait dès la
+première ouverture et repeint aussitôt l'app, **le reçu imprimé** et
+**l'icône sur l'écran d'accueil du téléphone** — celle-ci est fabriquée à la
+volée à partir du logo retenu, au lieu d'être un fichier figé. Nom, slogan,
 coordonnées, devise, message de remerciement et politique d'échange sont tous
 modifiables.
 
@@ -166,7 +168,7 @@ Six règles tenues dans tout le code :
 6. **Aucune dépendance à un serveur extérieur** : moteur graphique, pdf.js et
    SQLite sont livrés avec l'application. Elle ne contacte personne.
 
-`flutter analyze` : aucun problème. `flutter test` : 109 tests, dont le parcours
+`flutter analyze` : aucun problème. `flutter test` : 116 tests, dont le parcours
 complet de vente, la fabrication réelle du reçu PDF dans les deux formats, et
 celle du document comptable sur plusieurs pages.
 

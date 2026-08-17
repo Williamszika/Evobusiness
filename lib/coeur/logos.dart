@@ -74,6 +74,45 @@ String logoSvg(String cle, {required String primaire, required String accent}) {
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">\n$corps\n</svg>';
 }
 
+/// Le même logo, mais en **icône carrée pleine** : dessin blanc sur le fond de
+/// la marque, comme l'exige une icône d'écran d'accueil.
+///
+/// Deux contraintes d'Apple sont respectées ici : aucune transparence — le
+/// fond est un carré plein — et aucun coin arrondi, iOS applique son propre
+/// masque. Le logo n'occupe que 62 % du carré, parce que ce masque rogne.
+///
+/// Les initiales sont dessinées en SVG plutôt que superposées comme à l'écran :
+/// une icône doit tenir en un seul fichier.
+String logoSvgIcone(
+  String cle, {
+  required String fond,
+  required String accent,
+  String initiales = '',
+  int taille = 180,
+}) {
+  final corps = logoSvg(cle, primaire: '#FFFFFF', accent: accent)
+      .replaceFirst('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">', '')
+      .replaceFirst('</svg>', '')
+      .trim();
+
+  // 62 % de 96, centré : le dessin va de 18,24 à 77,76 dans le carré.
+  const marge = 18.24;
+  const cote = 59.52;
+  final lettres = logoPorteInitiales(cle) && initiales.isNotEmpty
+      ? '<text x="48" y="48" text-anchor="middle" dominant-baseline="central" '
+          'font-family="Georgia, serif" font-weight="700" font-size="20" '
+          'fill="$fond">$initiales</text>'
+      : '';
+
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="$taille" height="$taille" '
+      'viewBox="0 0 96 96">'
+      '<rect width="96" height="96" fill="$fond"/>'
+      '<svg x="$marge" y="$marge" width="$cote" height="$cote" viewBox="0 0 96 96">'
+      '$corps$lettres'
+      '</svg>'
+      '</svg>';
+}
+
 /// Initiales de la boutique, pour le monogramme (« Belle Couronne » → « BC »).
 ///
 /// Sur une boutique pas encore nommée — l'écran de première ouverture, avant

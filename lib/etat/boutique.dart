@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../coeur/argent.dart';
 import '../coeur/constantes.dart';
+import '../coeur/icone_appareil.dart';
 import '../donnees/demo.dart';
 import '../donnees/depot.dart';
 import '../donnees/modeles.dart';
@@ -187,6 +188,9 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
       depenses: await d.lireDepenses(),
       mouvements: await d.lireMouvements(),
     );
+    // Au démarrage comme après une restauration, l'icône doit refléter la
+    // marque effectivement enregistrée.
+    majIconeAppareil(state.parametres);
   }
 
   // ───────────────────────────────────────────────────────────── paramètres
@@ -194,6 +198,9 @@ class BoutiqueNotifier extends StateNotifier<EtatBoutique> {
   Future<void> majParametres(Parametres p) async {
     await depot.ecrireParametres(p);
     state = state.copie(parametres: p);
+    // Le logo et la palette viennent peut-être de changer : l'icône d'écran
+    // d'accueil doit suivre, sinon la boutique porterait celle d'une autre.
+    majIconeAppareil(p);
   }
 
   // ─────────────────────────────────────────────────────────────── produits
